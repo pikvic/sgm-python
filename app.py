@@ -47,8 +47,8 @@ def kmeans():
             name = url.split('/')[-1]
             with open(uploads / name, 'wb') as f:
                 f.write(res.content)
-            nclusters = request.args.get('nclusters', 6)
-            run_kmeans(name, n_clusters=nclusters)
+            nclusters = request.args.get('nclusters', '6')
+            run_kmeans(name, n_clusters=int(nclusters))
             return jsonify({'success': True, 'result': request.url_root + "downloads/" + str(name)})
     return jsonify({'success': False, 'error': 'File Not Loaded!'})
 
