@@ -3,6 +3,7 @@ import uuid
 import datetime
 import requests
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from sklearn.cluster import KMeans
@@ -36,7 +37,6 @@ def parse_params(request_args):
 
 def run_kmeans(filename, params):
     results = []
-    filename = 'data.csv'
     df = pd.read_csv(uploads / filename)
     data = df.iloc[:, 2:]
     if params['normalize']:
@@ -67,6 +67,34 @@ def run_kmeans(filename, params):
         results.append(request.url_root + "downloads/" + 'kmeans_figure.png')
     return results
 
+def run_pca(filename, params):
+    results = []
+    df = pd.read_csv(uploads / filename)
+    data = df.iloc[:, 2:]
+    params['show_graph'] = True
+    params['normalize'] = True
+    if params['normalize']:
+        scaler = StandardScaler()
+        data = scaler.fit_transform(data)
+    pca = PCA()
+    components = pca.fit_transform(data)
+    if params['show_graph']:
+        fig, ax = plt.subplots()
+        ax.bar(list(range(1, pca.n_components_ + 1)), pca.explained_variance_ratio_)
+        ax.set_title('Principal Component Analysis')
+        ax.set_xlabel('Number of components')
+        ax.set_ylabel('Explained Variance Ratio')
+        fig.savefig(downloads / 'pca_figure_1.png', dpi=300)
+        results.append(request.url_root + "downloads/" + 'pca_figure_1.png')
+        fig, ax = plt.subplots()
+        ax.plot(list(range(1, pca.n_components_ + 1)), np.cumsum(pca.explained_variance_ratio_))
+        ax.set_title('Principal Component Analysis')
+        ax.set_xlabel('Number of components')
+        ax.set_ylabel('Cumulative Explained Variance Ratio')
+        fig.savefig(downloads / 'pca_figure_2.png', dpi=300)
+        results.append(request.url_root + "downloads/" + 'pca_figure_2.png')
+    return results
+
 @app.route('/')
 def index():
     return "Hello, World!"
@@ -89,6 +117,21 @@ def kmeans():
             results = run_kmeans(name, params)
             return jsonify({'success': True, 'results': results})
     return jsonify({'success': False, 'error': 'File Not Loaded!'})
+
+@app.route('/pca')
+def pca():
+    if 'file' in request.args:
+        url = request.args['file']
+        res = requests.get(url)
+        if res.ok:
+            name = url.split('/')[-1]
+            with open(uploads / name, 'wb') as f:
+                f.write(res.content)
+            params = parse_params(request.args)
+            results = run_pca(name, params)
+            return jsonify({'success': True, 'results': results})
+    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+
 
 @app.route('/test')
 def test():
