@@ -2,6 +2,7 @@ import os
 import uuid
 import datetime
 import requests
+import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,6 +35,31 @@ def parse_params(request_args):
     params['normalize'] = bool(int(request_args.get('normalize', 0)))
     params['show_graph'] = bool(int(request_args.get('show_graph', 0)))
     return params
+
+def run_stats(filename, params):
+    results = []
+    df = pd.read_csv(uploads / filename)
+    data = df.iloc[:, 2:]
+    stats = data.describe()
+    stats.index.name = "Stats"
+    output = 'result.csv'
+    if params['transpose']:
+        stats.T.to_csv(output)
+    else:
+        stats.to_csv(output)
+    results.append(request.url_root + "downloads/" + output)
+    if params['show_graph']:
+        sns.set_style("whitegrid")
+        sns.set_context("talk")
+        for i, column in enumerate(data.columns):
+            fig, ax = plt.subplots(2, 1, figsize=(6, 10), dpi=300)
+            sns.distplot(data[column], ax=ax[0])
+            sns.boxplot(data[column], ax=ax[1])
+            figname = f'Column_{i + 1}.png'
+            fig.savefig(figname, bbox_inches = 'tight')
+            results.append(request.url_root + "downloads/" + figname)
+            plt.close(fig)
+    return results
 
 def run_kmeans(filename, params):
     results = []
@@ -129,6 +155,20 @@ def pca():
                 f.write(res.content)
             params = parse_params(request.args)
             results = run_pca(name, params)
+            return jsonify({'success': True, 'results': results})
+    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+
+@app.route('/stats')
+def stats():
+    if 'file' in request.args:
+        url = request.args['file']
+        res = requests.get(url)
+        if res.ok:
+            name = url.split('/')[-1]
+            with open(uploads / name, 'wb') as f:
+                f.write(res.content)
+            params = parse_params(request.args)
+            results = run_stats(name, params)
             return jsonify({'success': True, 'results': results})
     return jsonify({'success': False, 'error': 'File Not Loaded!'})
 
