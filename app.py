@@ -107,7 +107,7 @@ def run_pca(filename, params):
         scaler = StandardScaler()
         data = scaler.fit_transform(data)
     pca = PCA()
-    pca.fit()
+    pca.fit(data)
     
     components = pd.DataFrame(pca.components_, columns=data.columns)
     components.index.name = 'Component'
