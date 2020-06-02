@@ -97,7 +97,7 @@ def run_kmeans(filename, params):
         ax.set_xlabel('Principal Component 0')
         ax.set_ylabel('Principal Component 1')
         ax.legend(*scatter.legend_elements(), title="Clusters")
-        fig.savefig(downloads / 'kmeans_figure.png')
+        fig.savefig(downloads / 'kmeans_figure.png', bbox_inches = 'tight')
         results.append(request.url_root + "downloads/" + 'kmeans_figure.png')
     return results
 
@@ -127,13 +127,13 @@ def run_pca(filename, params):
         ax.set_xlabel('Number of components')
         ax.set_ylabel('Explained Variance Ratio')
         fig.savefig(downloads / 'pca_figure_1.png')
-        results.append(request.url_root + "downloads/" + 'pca_figure_1.png')
+        results.append(request.url_root + "downloads/" + 'pca_figure_1.png', bbox_inches = 'tight')
         fig, ax = plt.subplots()
         ax.plot(list(range(1, pca.n_components_ + 1)), np.cumsum(pca.explained_variance_ratio_))
         ax.set_title('Principal Component Analysis')
         ax.set_xlabel('Number of components')
         ax.set_ylabel('Cumulative Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_2.png')
+        fig.savefig(downloads / 'pca_figure_2.png', bbox_inches = 'tight')
         results.append(request.url_root + "downloads/" + 'pca_figure_2.png')
     return results
 
