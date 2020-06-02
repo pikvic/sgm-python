@@ -11,6 +11,8 @@ from sklearn.cluster import KMeans
 from flask import Flask, jsonify, request, send_from_directory
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
 
 app = Flask(__name__)
@@ -34,6 +36,9 @@ def parse_params(request_args):
     params['add_result_columns'] = bool(int(request_args.get('add_result_columns', 0)))
     params['normalize'] = bool(int(request_args.get('normalize', 0)))
     params['show_graph'] = bool(int(request_args.get('show_graph', 0)))
+    params['transpose'] = bool(int(request_args.get('transpose', 0)))
+    params['x_column'] = int(request_args.get('x_column', '1'))
+    params['y_column'] = int(request_args.get('y_column', '2'))
     return params
 
 def run_stats(filename, params):
@@ -121,6 +126,39 @@ def run_pca(filename, params):
         results.append(request.url_root + "downloads/" + 'pca_figure_2.png')
     return results
 
+def run_linear(filename, params):
+    results = []
+    df = pd.read_csv(uploads / filename)
+    data = df.iloc[:, 2:]
+    x_column_id = params['x_column'] - 1
+    y_column_id = params['y_column'] - 1
+    x_column_id = x_column_id if x_column_id < len(data.columns) else 0
+    y_column_id = y_column_id if y_column_id < len(data.columns) else 1
+
+    x = data.iloc[:, x_column_id].values.reshape(-1, 1)
+    y = data.iloc[:, y_column_id].values.reshape(-1, 1)
+
+    lr = LinearRegression()
+    lr.fit(x, y)
+    yhat = lr.predict(x)
+
+    res = {
+        'Parameter': ['Coefficient', 'Intercept', 'Mean Squared Error'],
+        'Value': [lr.coef_[0][0], lr.intercept_[0], mean_squared_error(y, yhat)]
+        }
+    pd.DataFrame(res).to_csv(output, index=False)
+    results.append(request.url_root + "downloads/" + output)
+    
+    fig, ax = plt.subplots(dpi=300)
+    sns.regplot(x, y, yhat, ax=ax)
+    ax.set(title=f'y = {lr.coef_[0][0]:.4f}x + {lr.intercept_[0]:.4f}')
+    ax.set(xlabel=data.columns[x_column_id], ylabel=data.columns[y_column_id])
+    figname = f'Regression_Column{x_column_id}_Column{y_column_id}.png'
+    fig.savefig(figname, bbox_inches = 'tight')
+    results.append(request.url_root + "downloads/" + figname)
+
+    return results
+
 @app.route('/')
 def index():
     return "Hello, World!"
@@ -169,6 +207,21 @@ def stats():
                 f.write(res.content)
             params = parse_params(request.args)
             results = run_stats(name, params)
+            return jsonify({'success': True, 'results': results})
+    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+
+
+@app.route('/linear')
+def linear():
+    if 'file' in request.args:
+        url = request.args['file']
+        res = requests.get(url)
+        if res.ok:
+            name = url.split('/')[-1]
+            with open(uploads / name, 'wb') as f:
+                f.write(res.content)
+            params = parse_params(request.args)
+            results = run_linear(name, params)
             return jsonify({'success': True, 'results': results})
     return jsonify({'success': False, 'error': 'File Not Loaded!'})
 
