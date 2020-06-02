@@ -137,6 +137,7 @@ def run_pca(filename, params):
 
 def run_linear(filename, params):
     results = []
+    output = 'result.csv'
     df = pd.read_csv(uploads / filename)
     data = df.iloc[:, 2:]
     x_column_id = params['x_column'] - 1
