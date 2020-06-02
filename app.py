@@ -102,13 +102,21 @@ def run_pca(filename, params):
     results = []
     df = pd.read_csv(uploads / filename)
     data = df.iloc[:, 2:]
-    params['show_graph'] = True
-    params['normalize'] = True
     if params['normalize']:
         scaler = StandardScaler()
         data = scaler.fit_transform(data)
     pca = PCA()
-    components = pca.fit_transform(data)
+    pca.fit()
+    
+    components = pd.DataFrame(pca.components_, columns=data.columns)
+    components.index.name = 'Component'
+    components.to_csv('components.csv')
+    results.append(request.url_root + "downloads/" + 'components.csv')
+
+    pd.DataFrame({'Explained Variance': pca.explained_variance_,
+              'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv('variance.csv', index=False)
+    results.append(request.url_root + "downloads/" + 'variance.csv')
+
     if params['show_graph']:
         fig, ax = plt.subplots()
         ax.bar(list(range(1, pca.n_components_ + 1)), pca.explained_variance_ratio_)
