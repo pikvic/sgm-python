@@ -234,6 +234,9 @@ def linear():
             return jsonify({'success': True, 'results': results})
     return jsonify({'success': False, 'error': 'File Not Loaded!'})
 
+@app.route('/test_file')
+def test_file():
+    return send_from_directory(Path().cwd(), 'data.csv', as_attachment=True, cache_timeout=0) 
 
 @app.route('/test')
 def test():
