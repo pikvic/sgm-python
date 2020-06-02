@@ -58,7 +58,7 @@ def run_stats(filename, params):
     results.append(request.url_root + "downloads/" + output)
     if params['show_graph']:
         for i, column in enumerate(data.columns):
-            fig, ax = plt.subplots(2, 1, figsize=(6, 10), dpi=300)
+            fig, ax = plt.subplots(2, 1, figsize=(6, 10))
             sns.distplot(data[column], ax=ax[0])
             sns.boxplot(data[column], ax=ax[1])
             figname = f'Column_{i + 1}.png'
@@ -95,7 +95,7 @@ def run_kmeans(filename, params):
         ax.set_xlabel('Principal Component 0')
         ax.set_ylabel('Principal Component 1')
         ax.legend(*scatter.legend_elements(), title="Clusters")
-        fig.savefig(downloads / 'kmeans_figure.png', dpi=300)
+        fig.savefig(downloads / 'kmeans_figure.png')
         results.append(request.url_root + "downloads/" + 'kmeans_figure.png')
     return results
 
@@ -124,14 +124,14 @@ def run_pca(filename, params):
         ax.set_title('Principal Component Analysis')
         ax.set_xlabel('Number of components')
         ax.set_ylabel('Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_1.png', dpi=300)
+        fig.savefig(downloads / 'pca_figure_1.png')
         results.append(request.url_root + "downloads/" + 'pca_figure_1.png')
         fig, ax = plt.subplots()
         ax.plot(list(range(1, pca.n_components_ + 1)), np.cumsum(pca.explained_variance_ratio_))
         ax.set_title('Principal Component Analysis')
         ax.set_xlabel('Number of components')
         ax.set_ylabel('Cumulative Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_2.png', dpi=300)
+        fig.savefig(downloads / 'pca_figure_2.png')
         results.append(request.url_root + "downloads/" + 'pca_figure_2.png')
     return results
 
@@ -158,7 +158,7 @@ def run_linear(filename, params):
     pd.DataFrame(res).to_csv(output, index=False)
     results.append(request.url_root + "downloads/" + output)
     
-    fig, ax = plt.subplots(dpi=300)
+    fig, ax = plt.subplots()
     sns.regplot(x, y, yhat, ax=ax)
     ax.set(title=f'y = {lr.coef_[0][0]:.4f}x + {lr.intercept_[0]:.4f}')
     ax.set(xlabel=data.columns[x_column_id], ylabel=data.columns[y_column_id])
