@@ -24,6 +24,9 @@ if not uploads.exists():
 if not downloads.exists():
     downloads.mkdir()
 
+sns.set_style("whitegrid")
+sns.set_context("talk")
+
 
 def parse_params(request_args):
     params = {}
@@ -54,8 +57,6 @@ def run_stats(filename, params):
         stats.to_csv(output)
     results.append(request.url_root + "downloads/" + output)
     if params['show_graph']:
-        sns.set_style("whitegrid")
-        sns.set_context("talk")
         for i, column in enumerate(data.columns):
             fig, ax = plt.subplots(2, 1, figsize=(6, 10), dpi=300)
             sns.distplot(data[column], ax=ax[0])
