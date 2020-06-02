@@ -52,9 +52,9 @@ def run_stats(filename, params):
     stats.index.name = "Stats"
     output = 'result.csv'
     if params['transpose']:
-        stats.T.to_csv(output)
+        stats.T.to_csv(downloads / output)
     else:
-        stats.to_csv(output)
+        stats.to_csv(downloads / output)
     results.append(request.url_root + "downloads/" + output)
     if params['show_graph']:
         for i, column in enumerate(data.columns):
@@ -62,7 +62,7 @@ def run_stats(filename, params):
             sns.distplot(data[column], ax=ax[0])
             sns.boxplot(data[column], ax=ax[1])
             figname = f'Column_{i + 1}.png'
-            fig.savefig(figname, bbox_inches = 'tight')
+            fig.savefig(downloads / figname, bbox_inches = 'tight')
             results.append(request.url_root + "downloads/" + figname)
             plt.close(fig)
     return results
@@ -156,15 +156,15 @@ def run_linear(filename, params):
         'Parameter': ['Coefficient', 'Intercept', 'Mean Squared Error'],
         'Value': [lr.coef_[0][0], lr.intercept_[0], mean_squared_error(y, yhat)]
         }
-    pd.DataFrame(res).to_csv(output, index=False)
+    pd.DataFrame(res).to_csv(downloads / output, index=False)
     results.append(request.url_root + "downloads/" + output)
     
     fig, ax = plt.subplots()
     sns.regplot(x, y, yhat, ax=ax)
     ax.set(title=f'y = {lr.coef_[0][0]:.4f}x + {lr.intercept_[0]:.4f}')
     ax.set(xlabel=data.columns[x_column_id], ylabel=data.columns[y_column_id])
-    figname = f'Regression_Column{x_column_id}_Column{y_column_id}.png'
-    fig.savefig(figname, bbox_inches = 'tight')
+    figname = f'Regression_Column{x_column_id + 1}_Column{y_column_id + 1}.png'
+    fig.savefig(downloads / figname, bbox_inches = 'tight')
     results.append(request.url_root + "downloads/" + figname)
 
     return results
