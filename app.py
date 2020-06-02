@@ -42,12 +42,15 @@ def parse_params(request_args):
     params['transpose'] = bool(int(request_args.get('transpose', 0)))
     params['x_column'] = int(request_args.get('x_column', '1'))
     params['y_column'] = int(request_args.get('y_column', '2'))
+    params['column'] = int(request_args.get('column', '1'))
     return params
 
 def run_stats(filename, params):
     results = []
     df = pd.read_csv(uploads / filename)
     data = df.iloc[:, 2:]
+    column = params['column'] - 1
+    data = data.iloc[:, column]
     stats = data.describe()
     stats.index.name = "Stats"
     output = 'result.csv'
@@ -57,14 +60,13 @@ def run_stats(filename, params):
         stats.to_csv(downloads / output)
     results.append(request.url_root + "downloads/" + output)
     if params['show_graph']:
-        for i, column in enumerate(data.columns):
-            fig, ax = plt.subplots(2, 1, figsize=(6, 10))
-            sns.distplot(data[column], ax=ax[0])
-            sns.boxplot(data[column], ax=ax[1])
-            figname = f'Column_{i + 1}.png'
-            fig.savefig(downloads / figname, bbox_inches = 'tight')
-            results.append(request.url_root + "downloads/" + figname)
-            plt.close(fig)
+        fig, ax = plt.subplots(2, 1, figsize=(6, 10))
+        sns.distplot(data, ax=ax[0])
+        sns.boxplot(data, ax=ax[1])
+        figname = f'Column_{column + 1}.png'
+        fig.savefig(downloads / figname, bbox_inches = 'tight')
+        results.append(request.url_root + "downloads/" + figname)
+        plt.close(fig)
     return results
 
 def run_kmeans(filename, params):
