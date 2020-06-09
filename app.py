@@ -43,6 +43,7 @@ def parse_params(request_args):
     params['y_column'] = int(request_args.get('y_column', '2'))
     params['column'] = int(request_args.get('column', '1'))
     params['exclude'] = request_args.get('exclude', '')
+    params['levels'] = request_args.get('levels', '3')
     return params
 
 def check_file_and_run_task(task):

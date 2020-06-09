@@ -9,7 +9,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-
+from scipy.cluster.hierarchy import dendrogram
+from sklearn.cluster import AgglomerativeClustering
 
 root = Path()
 uploads = root / 'uploads'
@@ -67,7 +68,7 @@ def run_kmeans(filename, params):
     if isinstance(df, dict) and 'error' in df:
         return df
 
-    if params['exclude']
+    if params['exclude']:
         pattern = r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$'
         if not re.search(pattern, params['exclude']):
             return {'error': 'Wrong exclude columns pattern!'}
@@ -81,7 +82,7 @@ def run_kmeans(filename, params):
                     columns = columns | set(range(int(left) - 1, int(right)))
             else:
                 columns.add(int(r) - 1)
-        columns = list({i for range(len(df.columns))} - columns)
+        columns = list({i for i in range(len(df.columns))} - columns)
         data = df.iloc[:, columns]
     else:
         data = df.iloc[:, :]        
@@ -120,7 +121,7 @@ def run_pca(filename, params):
     if isinstance(df, dict) and 'error' in df:
         return df
 
-    if params['exclude']
+    if params['exclude']:
         pattern = r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$'
         if not re.search(pattern, params['exclude']):
             return {'error': 'Wrong exclude columns pattern!'}
@@ -134,7 +135,7 @@ def run_pca(filename, params):
                     columns = columns | set(range(int(left) - 1, int(right)))
             else:
                 columns.add(int(r) - 1)
-        columns = list({i for range(len(df.columns))} - columns)
+        columns = list({i for i in range(len(df.columns))} - columns)
         data = df.iloc[:, columns]
     else:
         data = df.iloc[:, :]   
@@ -207,3 +208,72 @@ def run_linear(filename, params):
     results.append(request.url_root + "downloads/" + figname)
 
     return results
+
+def plot_dendrogram(model, **kwargs):
+    # Create linkage matrix and then plot the dendrogram
+
+    # create the counts of samples under each node
+    counts = np.zeros(model.children_.shape[0])
+    n_samples = len(model.labels_)
+    for i, merge in enumerate(model.children_):
+        current_count = 0
+        for child_idx in merge:
+            if child_idx < n_samples:
+                current_count += 1  # leaf node
+            else:
+                current_count += counts[child_idx - n_samples]
+        counts[i] = current_count
+
+    linkage_matrix = np.column_stack([model.children_, model.distances_,
+                                      counts]).astype(float)
+    print(linkage_matrix)
+    # Plot the corresponding dendrogram
+    dendrogram(linkage_matrix, **kwargs)
+
+
+def run_hca(filename, params):
+    results = []
+    df = check_and_load_file(filename)
+    if isinstance(df, dict) and 'error' in df:
+        return df
+
+    if params['exclude']:
+        pattern = r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$'
+        if not re.search(pattern, params['exclude']):
+            return {'error': 'Wrong exclude columns pattern!'}
+
+        res = re.findall(r'\d+(?:-\d+)*', params['exclude'])
+        columns = set()
+        for r in res:
+            if '-' in r:
+                left, right = r.split('-')
+                if left < right:
+                    columns = columns | set(range(int(left) - 1, int(right)))
+            else:
+                columns.add(int(r) - 1)
+        columns = list({i for i in range(len(df.columns))} - columns)
+        data = df.iloc[:, columns]
+    else:
+        data = df.iloc[:, :]   
+
+    if params['normalize']:
+        scaler = StandardScaler()
+        data = scaler.fit_transform(data)
+
+    model = AgglomerativeClustering(distance_threshold=0, n_clusters=None)
+    model.fit(data)
+
+    distances = pd.DataFrame(model.distances_, columns=['distance'])
+    distances.index.name = 'Cluster Number'
+    distances.to_csv(downloads / 'distances.csv')
+    results.append(request.url_root + "downloads/" + 'distances.csv')
+
+    fig, ax = plt.subplots()
+    plot_dendrogram(model, truncate_mode='level', p=params['levels'], ax=ax)
+    ax.set_title('Hierarchical Clustering Dendrogram')
+    ax.set_xlabel('Number of points in node (or index of point if no parenthesis).')
+    ax.set_ylabel('Distance')
+    fig.savefig(downloads / 'hca_figure_1.png')
+    results.append(request.url_root + "downloads/" + 'hca_figure_1.png', bbox_inches = 'tight')
+    return results
+
