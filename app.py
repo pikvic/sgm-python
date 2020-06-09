@@ -46,7 +46,7 @@ def parse_params(request_args):
     params['levels'] = request_args.get('levels', '3')
     return params
 
-def check_file_and_run_task(task):
+def check_file_and_run_task(request, task):
     if 'file' in request.args:
         url = request.args['file']
         res = requests.get(url)
@@ -73,23 +73,23 @@ def get_file(filename):
 
 @app.route('/kmeans')
 def kmeans():
-    return check_file_and_run_task(run_kmeans)
+    return check_file_and_run_task(request, run_kmeans)
     
 @app.route('/pca')
 def pca():
-    return check_file_and_run_task(run_pca)
+    return check_file_and_run_task(request, run_pca)
     
 @app.route('/hca')
 def hca():
-    return check_file_and_run_task(run_hca)
+    return check_file_and_run_task(request, run_hca)
     
 @app.route('/stats')
 def stats():
-    return check_file_and_run_task(run_stats)
+    return check_file_and_run_task(request, run_stats)
     
 @app.route('/linear')
 def linear():
-    return check_file_and_run_task(run_linear)
+    return check_file_and_run_task(request, run_linear)
     
 @app.route('/test_file')
 def test_file():
