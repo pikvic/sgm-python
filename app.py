@@ -12,7 +12,7 @@ import os
 import uuid
 import datetime
 import requests
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, request
 from pathlib import Path
 from service import run_stats, run_pca, run_linear, run_kmeans, run_hca
 
