@@ -156,7 +156,8 @@ def run_pca(filename, params):
     pd.DataFrame({'Explained Variance': pca.explained_variance_,
               'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv(downloads / 'variance.csv', index=False)
     results.append(request.url_root + "downloads/" + 'variance.csv')
-
+    
+    params['show_graph'] = True
     if params['show_graph']:
         fig, ax = plt.subplots()
         ax.bar(list(range(1, pca.n_components_ + 1)), pca.explained_variance_ratio_)
@@ -227,7 +228,6 @@ def plot_dendrogram(model, **kwargs):
 
     linkage_matrix = np.column_stack([model.children_, model.distances_,
                                       counts]).astype(float)
-    print(linkage_matrix)
     # Plot the corresponding dendrogram
     dendrogram(linkage_matrix, **kwargs)
 
