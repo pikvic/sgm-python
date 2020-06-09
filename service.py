@@ -150,11 +150,11 @@ def run_pca(filename, params):
     
     components = pd.DataFrame(pca.components_, columns=data.columns)
     components.index.name = 'Component'
-    components.to_csv('components.csv')
+    components.to_csv(downloads / 'components.csv')
     results.append(request.url_root + "downloads/" + 'components.csv')
 
     pd.DataFrame({'Explained Variance': pca.explained_variance_,
-              'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv('variance.csv', index=False)
+              'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv(downloads / 'variance.csv', index=False)
     results.append(request.url_root + "downloads/" + 'variance.csv')
 
     if params['show_graph']:
@@ -163,8 +163,8 @@ def run_pca(filename, params):
         ax.set_title('Principal Component Analysis')
         ax.set_xlabel('Number of components')
         ax.set_ylabel('Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_1.png')
-        results.append(request.url_root + "downloads/" + 'pca_figure_1.png', bbox_inches = 'tight')
+        fig.savefig(downloads / 'pca_figure_1.png', bbox_inches = 'tight')
+        results.append(request.url_root + "downloads/" + 'pca_figure_1.png')
         fig, ax = plt.subplots()
         ax.plot(list(range(1, pca.n_components_ + 1)), np.cumsum(pca.explained_variance_ratio_))
         ax.set_title('Principal Component Analysis')
@@ -274,7 +274,7 @@ def run_hca(filename, params):
     ax.set_title('Hierarchical Clustering Dendrogram')
     ax.set_xlabel('Number of points in node (or index of point if no parenthesis).')
     ax.set_ylabel('Distance')
-    fig.savefig(downloads / 'hca_figure_1.png')
-    results.append(request.url_root + "downloads/" + 'hca_figure_1.png', bbox_inches = 'tight')
+    fig.savefig(downloads / 'hca_figure_1.png', bbox_inches = 'tight')
+    results.append(request.url_root + "downloads/" + 'hca_figure_1.png')
     return results
 
