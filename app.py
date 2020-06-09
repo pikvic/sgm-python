@@ -14,7 +14,7 @@ import datetime
 import requests
 from flask import Flask, send_from_directory, jsonify
 from pathlib import Path
-from service import run_stats, run_pca, run_linear, run_kmeans
+from service import run_stats, run_pca, run_linear, run_kmeans, run_hca
 
 
 app = Flask(__name__)
@@ -85,6 +85,12 @@ def pca():
     except:
         return jsonify({'success': False, 'error': 'Runtime error!'}) 
 
+@app.route('/hca')
+def hca():
+    try:
+        return check_file_and_run_task(run_hca)
+    except:
+        return jsonify({'success': False, 'error': 'Runtime error!'}) 
 
 @app.route('/stats')
 def stats():
