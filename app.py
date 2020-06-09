@@ -1,18 +1,20 @@
+# TODO
+# - функция построения графиков с опциями
+# - функция чтения файла в зависимости от формата и выбранных столбцов
+# - создание ответа (jsonify...)
+# - хранение файлов в редисе какое-то время
+# - создание заданий в редисе
+# - воркер для заданий в редисе
+# - params в keyword агрументы или kwargs
+# - в итоге функция подготовки к вызову обработки: валидация, скачивание файла и т.д.
+
 import os
 import uuid
 import datetime
 import requests
-import seaborn as sns
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+from flask import Flask, send_from_directory, jsonify
 from pathlib import Path
-from sklearn.cluster import KMeans
-from flask import Flask, jsonify, request, send_from_directory
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+from service import run_stats, run_pca, run_linear, run_kmeans
 
 
 app = Flask(__name__)
@@ -23,9 +25,6 @@ if not uploads.exists():
     uploads.mkdir()
 if not downloads.exists():
     downloads.mkdir()
-
-sns.set_style("whitegrid")
-sns.set_context("talk")
 
 
 def parse_params(request_args):
@@ -43,133 +42,24 @@ def parse_params(request_args):
     params['x_column'] = int(request_args.get('x_column', '1'))
     params['y_column'] = int(request_args.get('y_column', '2'))
     params['column'] = int(request_args.get('column', '1'))
+    params['exclude'] = request_args.get('exclude', '')
     return params
 
-def run_stats(filename, params):
-    results = []
-    df = pd.read_csv(uploads / filename)
-    data = df.iloc[:, 2:]
-    column = params['column'] - 1
-    data = data.iloc[:, column]
-    stats = data.describe()
-    stats.index.name = "Stats"
-    output = 'result.csv'
-    if params['transpose']:
-        stats.T.to_csv(downloads / output)
-    else:
-        stats.to_csv(downloads / output)
-    results.append(request.url_root + "downloads/" + output)
-    if params['show_graph']:
-        fig, ax = plt.subplots(2, 1, figsize=(6, 10))
-        sns.distplot(data, ax=ax[0])
-        sns.boxplot(data, ax=ax[1])
-        figname = f'Column_{column + 1}.png'
-        fig.savefig(downloads / figname, bbox_inches = 'tight')
-        results.append(request.url_root + "downloads/" + figname)
-        plt.close(fig)
-    return results
-
-def run_kmeans(filename, params):
-    results = []
-    df = pd.read_csv(uploads / filename)
-    data = df.iloc[:, 2:]
-    if params['normalize']:
-        scaler = StandardScaler()
-        data = scaler.fit_transform(data)
-    kmeans = KMeans(n_clusters=params['n_clusters'], random_state=params['random_state'])
-    labels = kmeans.fit_predict(data) + 1
-    if params['add_result_columns']:
-        df['Cluster'] = labels
-        df.to_csv(downloads / 'kmeans_result.csv', index=False)
-    else:
-        new_df = pd.DataFrame(labels, columns=['Cluster'])
-        new_df.to_csv(downloads / 'kmeans_result.csv', index=False)
-    results.append(request.url_root + "downloads/" + 'kmeans_result.csv')
-    if params['show_stats']:
-        centers = kmeans.cluster_centers_
-        inertia = kmeans.inertia_
-    if params['show_graph']:
-        pca = PCA(n_components=2)
-        components = pca.fit_transform(data)
-        fig, ax = plt.subplots()
-        scatter = ax.scatter(components[:, 0], components[:, 1], c=labels)
-        ax.set_title('Clustering In Principal Components')
-        ax.set_xlabel('Principal Component 0')
-        ax.set_ylabel('Principal Component 1')
-        ax.legend(*scatter.legend_elements(), title="Clusters")
-        fig.savefig(downloads / 'kmeans_figure.png', bbox_inches = 'tight')
-        results.append(request.url_root + "downloads/" + 'kmeans_figure.png')
-    return results
-
-def run_pca(filename, params):
-    results = []
-    df = pd.read_csv(uploads / filename)
-    data = df.iloc[:, 2:]
-    if params['normalize']:
-        scaler = StandardScaler()
-        data = scaler.fit_transform(data)
-    pca = PCA()
-    pca.fit(data)
-    
-    components = pd.DataFrame(pca.components_, columns=data.columns)
-    components.index.name = 'Component'
-    components.to_csv('components.csv')
-    results.append(request.url_root + "downloads/" + 'components.csv')
-
-    pd.DataFrame({'Explained Variance': pca.explained_variance_,
-              'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv('variance.csv', index=False)
-    results.append(request.url_root + "downloads/" + 'variance.csv')
-
-    if params['show_graph']:
-        fig, ax = plt.subplots()
-        ax.bar(list(range(1, pca.n_components_ + 1)), pca.explained_variance_ratio_)
-        ax.set_title('Principal Component Analysis')
-        ax.set_xlabel('Number of components')
-        ax.set_ylabel('Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_1.png')
-        results.append(request.url_root + "downloads/" + 'pca_figure_1.png', bbox_inches = 'tight')
-        fig, ax = plt.subplots()
-        ax.plot(list(range(1, pca.n_components_ + 1)), np.cumsum(pca.explained_variance_ratio_))
-        ax.set_title('Principal Component Analysis')
-        ax.set_xlabel('Number of components')
-        ax.set_ylabel('Cumulative Explained Variance Ratio')
-        fig.savefig(downloads / 'pca_figure_2.png', bbox_inches = 'tight')
-        results.append(request.url_root + "downloads/" + 'pca_figure_2.png')
-    return results
-
-def run_linear(filename, params):
-    results = []
-    output = 'result.csv'
-    df = pd.read_csv(uploads / filename)
-    data = df.iloc[:, 2:]
-    x_column_id = params['x_column'] - 1
-    y_column_id = params['y_column'] - 1
-    x_column_id = x_column_id if x_column_id < len(data.columns) else 0
-    y_column_id = y_column_id if y_column_id < len(data.columns) else 1
-
-    x = data.iloc[:, x_column_id].values.reshape(-1, 1)
-    y = data.iloc[:, y_column_id].values.reshape(-1, 1)
-
-    lr = LinearRegression()
-    lr.fit(x, y)
-    yhat = lr.predict(x)
-
-    res = {
-        'Parameter': ['Coefficient', 'Intercept', 'Mean Squared Error'],
-        'Value': [lr.coef_[0][0], lr.intercept_[0], mean_squared_error(y, yhat)]
-        }
-    pd.DataFrame(res).to_csv(downloads / output, index=False)
-    results.append(request.url_root + "downloads/" + output)
-    
-    fig, ax = plt.subplots()
-    sns.regplot(x, y, yhat, ax=ax)
-    ax.set(title=f'y = {lr.coef_[0][0]:.4f}x + {lr.intercept_[0]:.4f}')
-    ax.set(xlabel=data.columns[x_column_id], ylabel=data.columns[y_column_id])
-    figname = f'Regression_Column{x_column_id + 1}_Column{y_column_id + 1}.png'
-    fig.savefig(downloads / figname, bbox_inches = 'tight')
-    results.append(request.url_root + "downloads/" + figname)
-
-    return results
+def check_file_and_run_task(task):
+    if 'file' in request.args:
+        url = request.args['file']
+        res = requests.get(url)
+        if res.ok:
+            name = url.split('/')[-1]
+            with open(uploads / name, 'wb') as f:
+                f.write(res.content)
+            params = parse_params(request.args)
+            results = task(name, params)
+            if 'error' not in results:
+                return jsonify({'success': True, 'results': results})
+            else:
+                return jsonify(results)
+    return jsonify({'success': False, 'error': 'File Not Loaded!'})
 
 @app.route('/')
 def index():
@@ -182,60 +72,34 @@ def get_file(filename):
 
 @app.route('/kmeans')
 def kmeans():
-    if 'file' in request.args:
-        url = request.args['file']
-        res = requests.get(url)
-        if res.ok:
-            name = url.split('/')[-1]
-            with open(uploads / name, 'wb') as f:
-                f.write(res.content)
-            params = parse_params(request.args)
-            results = run_kmeans(name, params)
-            return jsonify({'success': True, 'results': results})
-    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+    try:
+        return check_file_and_run_task(run_kmeans)
+    except:
+        return jsonify({'success': False, 'error': 'Runtime error!'}) 
 
 @app.route('/pca')
 def pca():
-    if 'file' in request.args:
-        url = request.args['file']
-        res = requests.get(url)
-        if res.ok:
-            name = url.split('/')[-1]
-            with open(uploads / name, 'wb') as f:
-                f.write(res.content)
-            params = parse_params(request.args)
-            results = run_pca(name, params)
-            return jsonify({'success': True, 'results': results})
-    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+    try:
+        return check_file_and_run_task(run_pca)
+    except:
+        return jsonify({'success': False, 'error': 'Runtime error!'}) 
+
 
 @app.route('/stats')
 def stats():
-    if 'file' in request.args:
-        url = request.args['file']
-        res = requests.get(url)
-        if res.ok:
-            name = url.split('/')[-1]
-            with open(uploads / name, 'wb') as f:
-                f.write(res.content)
-            params = parse_params(request.args)
-            results = run_stats(name, params)
-            return jsonify({'success': True, 'results': results})
-    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+    try:
+        return check_file_and_run_task(run_stats)
+    except:
+        return jsonify({'success': False, 'error': 'Runtime error!'}) 
 
 
 @app.route('/linear')
 def linear():
-    if 'file' in request.args:
-        url = request.args['file']
-        res = requests.get(url)
-        if res.ok:
-            name = url.split('/')[-1]
-            with open(uploads / name, 'wb') as f:
-                f.write(res.content)
-            params = parse_params(request.args)
-            results = run_linear(name, params)
-            return jsonify({'success': True, 'results': results})
-    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+    try:
+        return check_file_and_run_task(run_linear)
+    except:
+        return jsonify({'success': False, 'error': 'Runtime error!'}) 
+
 
 @app.route('/test_file')
 def test_file():
