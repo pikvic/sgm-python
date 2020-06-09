@@ -140,7 +140,7 @@ def run_pca(filename, params):
         data = df.iloc[:, columns]
     else:
         data = df.iloc[:, :]   
-
+    columns = data.columns
     if params['normalize']:
         scaler = StandardScaler()
         data = scaler.fit_transform(data)
@@ -148,7 +148,7 @@ def run_pca(filename, params):
     pca = PCA()
     pca.fit(data)
     
-    components = pd.DataFrame(pca.components_, columns=data.columns)
+    components = pd.DataFrame(pca.components_, columns=columns)
     components.index.name = 'Component'
     components.to_csv(downloads / 'components.csv')
     results.append(request.url_root + "downloads/" + 'components.csv')
