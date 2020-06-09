@@ -73,41 +73,24 @@ def get_file(filename):
 
 @app.route('/kmeans')
 def kmeans():
-    try:
-        return check_file_and_run_task(run_kmeans)
-    except:
-        return jsonify({'success': False, 'error': 'Runtime error!'}) 
-
+    return check_file_and_run_task(run_kmeans)
+    
 @app.route('/pca')
 def pca():
-    try:
-        return check_file_and_run_task(run_pca)
-    except:
-        return jsonify({'success': False, 'error': 'Runtime error!'}) 
-
+    return check_file_and_run_task(run_pca)
+    
 @app.route('/hca')
 def hca():
-    try:
-        return check_file_and_run_task(run_hca)
-    except:
-        return jsonify({'success': False, 'error': 'Runtime error!'}) 
-
+    return check_file_and_run_task(run_hca)
+    
 @app.route('/stats')
 def stats():
-    try:
-        return check_file_and_run_task(run_stats)
-    except:
-        return jsonify({'success': False, 'error': 'Runtime error!'}) 
-
-
+    return check_file_and_run_task(run_stats)
+    
 @app.route('/linear')
 def linear():
-    try:
-        return check_file_and_run_task(run_linear)
-    except:
-        return jsonify({'success': False, 'error': 'Runtime error!'}) 
-
-
+    return check_file_and_run_task(run_linear)
+    
 @app.route('/test_file')
 def test_file():
     return send_from_directory(Path().cwd(), 'data.csv', as_attachment=True, cache_timeout=0) 
