@@ -44,7 +44,7 @@ def run_stats(filename, params):
     if isinstance(df, dict) and 'error' in df:
         return df
     column = params['column'] - 1
-    data = data.iloc[:, column]
+    data = df.iloc[:, column]
     stats = data.describe()
     stats.index.name = "Stats"
     output = 'result.csv'
