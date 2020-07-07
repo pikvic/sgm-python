@@ -57,8 +57,14 @@ def clear_files_for_job(job_id):
 def get_or_create_dir(root, job_id):
     my_logger.debug("Get or create dir")
     path = root / job_id
+    my_logger.debug(f"Path: {path} {path.exists()}")
     if not path.exists():
-        path.mkdir()
+        my_logger.debug(f"Mkdir")
+        try:
+            path.mkdir()
+        except Exception as e:
+            my_logger.debug(f"Mkdir failed!", e.msg)    
+        my_logger.debug(f"Mkdir done")
     return path
 
 def upload_file(url, job_id):
