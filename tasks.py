@@ -35,12 +35,16 @@ def get_or_create_dir(root, job_id):
 def upload_file(url, job_id):
     try:
         root = get_or_create_dir(config.UPLOAD_DIR, job_id)
+        print(root)
+        print(list(config.UPLOAD_DIR.iterdir()))
         res = requests.get(url)
-        
+        print(res)
         if res.ok:
             name = url.split('/')[-1]
+            print(name)
             with open(root / name, 'wb') as f:
                 f.write(res.content)
+            print('write')
         else:
             raise Exception
     except:
