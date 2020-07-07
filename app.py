@@ -1,108 +1,155 @@
-# TODO
-# - функция построения графиков с опциями
-# - функция чтения файла в зависимости от формата и выбранных столбцов
-# - создание ответа (jsonify...)
-# - хранение файлов в редисе какое-то время
-# - создание заданий в редисе
-# - воркер для заданий в редисе
-# - params в keyword агрументы или kwargs
-# - в итоге функция подготовки к вызову обработки: валидация, скачивание файла и т.д.
+from fastapi import FastAPI, HTTPException, status, Request
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field, HttpUrl, AnyUrl
+from typing import Optional, List
 
-import os
-import uuid
-import datetime
-import requests
-from flask import Flask, send_from_directory, jsonify, request
+from datetime import timedelta
 from pathlib import Path
-from service import run_stats, run_pca, run_linear, run_kmeans, run_hca
+from redis import from_url
+from rq import Queue
+from rq.job import Job
+from uuid import uuid4
+
+from tasks import run_stats, clear_files_for_job, run_kmeans, run_hca, run_linear, run_pca
+import config
+
+class StatsTaskParams(BaseModel):
+    url: HttpUrl
+    column: int = Field(..., gt=0)
+    transpose: Optional[bool] = False
+    showgraph: Optional[bool] = False
+
+class KMeansParams(BaseModel):
+    url: HttpUrl
+    nclusters: int = 6
+    randomstate: int = 0
+    exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
+    addresultcolumns: Optional[bool] = False
+    showstats: Optional[bool] = False
+    normalize: Optional[bool] = False
+    showgraph: Optional[bool] = False
+
+class PCAParams(BaseModel):
+    url: HttpUrl
+    exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
+    normalize: Optional[bool] = False
+    showgraph: Optional[bool] = False
+
+class HCAParams(BaseModel):
+    url: HttpUrl
+    exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
+    normalize: Optional[bool] = False
+
+class LinearParams(BaseModel):
+    url: HttpUrl
+    xcolumn: int = Field(..., gt=0)
+    ycolumn: int = Field(..., gt=0)
+
+class TaskPostResult(BaseModel):
+    job_id: str
+    url: str
+
+class TaskResult(BaseModel):
+    ready: bool = False
+    results: List[str] = None
 
 
-app = Flask(__name__)
-root = Path()
-uploads = root / 'uploads'
-downloads = root / 'downloads'
-if not uploads.exists():
-    uploads.mkdir()
-if not downloads.exists():
-    downloads.mkdir()
+app = FastAPI()
+red = from_url(config.REDIS_URL)
+queue = Queue(connection=red, default_timeout=3600)
 
+if not config.UPLOAD_DIR.exists():
+    config.UPLOAD_DIR.mkdir()
+if not config.DOWNLOAD_DIR.exists():
+    config.DOWNLOAD_DIR.mkdir()
 
-def parse_params(request_args):
-    params = {}
-    params['n_clusters'] = int(request_args.get('nclusters', '6'))
-    if 'random_state' in request_args:
-        params['random_state'] = int(request_args['random_state'])
+def generate_id():
+    return str(uuid4())
+
+@app.get("/")
+def root():
+    return {"message": "Hello World!", "uuid": generate_id()}
+
+@app.get("/jobs")
+def jobs_list():
+    #jobs = queue.jobs
+    job_ids = queue.finished_job_registry.get_job_ids()
+    #queue.fetch_job(job_id)
+    jobs = []
+    for job_id in job_ids:
+        job = queue.fetch_job(job_id)
+        jobs.append({'id': job.id, 'funcname': job.func_name, 'status': job.get_status()})
+    res = {'jobs': jobs}
+    return res
+
+@app.get("/results/{job_id}", response_model=TaskResult)
+def get_result(job_id):
+    try:
+        job = Job.fetch(job_id, connection=red)
+        if job.is_finished:
+            res = job.result
+            if 'error' in res:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=res['error'])
+            return TaskResult(**res)
+        else:
+            return TaskResult(ready=False)
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Task not found!')
+
+@app.get("/download/{job_id}/{filename}")
+def get_file(job_id, filename):
+    path = config.DOWNLOAD_DIR / job_id / filename
+    if path.exists():
+        return FileResponse(str(path))
     else:
-        params['random_state'] = None
-    params['show_stats'] = bool(int(request_args.get('show_stats', 0)))
-    params['add_result_columns'] = bool(int(request_args.get('add_result_columns', 0)))
-    params['normalize'] = bool(int(request_args.get('normalize', 0)))
-    params['show_graph'] = bool(int(request_args.get('show_graph', 0)))
-    params['transpose'] = bool(int(request_args.get('transpose', 0)))
-    params['x_column'] = int(request_args.get('x_column', '1'))
-    params['y_column'] = int(request_args.get('y_column', '2'))
-    params['column'] = int(request_args.get('column', '1'))
-    params['exclude'] = request_args.get('exclude', '')
-    params['levels'] = int(request_args.get('levels', '3'))
-    return params
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='File not found!')
 
-def check_file_and_run_task(request, task):
-    if 'file' in request.args:
-        url = request.args['file']
-        res = requests.get(url)
-        if res.ok:
-            name = url.split('/')[-1]
-            with open(uploads / name, 'wb') as f:
-                f.write(res.content)
-            params = parse_params(request.args)
-            results = task(name, params)
-            if 'error' not in results:
-                return jsonify({'success': True, 'results': results})
-            else:
-                return jsonify(results)
-    return jsonify({'success': False, 'error': 'File Not Loaded!'})
+@app.post("/stats", response_model=TaskPostResult)
+def stats(params: StatsTaskParams):
+    params_dict = params.dict()
+    job_id = generate_id()
+    params_dict['job_id'] = job_id
+    job = queue.enqueue_call(func=run_stats, args=(params_dict,), result_ttl=config.RESULT_TTL, job_id=job_id)
+    job_clear_files = queue.enqueue_in(timedelta(seconds=config.RESULT_TTL), func=clear_files_for_job, args=(job_id,))
+    res = {"job_id": job_id, "url": f"/results/{job_id}"}
+    return TaskPostResult(**res)
 
-@app.route('/')
-def index():
-    return "Hello, World!"
-
-@app.route('/downloads/<path:filename>')
-def get_file(filename):
-    if (downloads / filename).exists():
-        return send_from_directory(downloads, filename, as_attachment=True, cache_timeout=0)
-
-@app.route('/kmeans')
-def kmeans():
-    return check_file_and_run_task(request, run_kmeans)
+@app.post('/kmeans', response_model=TaskPostResult)
+def kmeans(params: KMeansParams):
+    params_dict = params.dict()
+    job_id = generate_id()
+    params_dict['job_id'] = job_id
+    job = queue.enqueue_call(func=run_kmeans, args=(params_dict,), result_ttl=config.RESULT_TTL, job_id=job_id)
+    job_clear_files = queue.enqueue_in(timedelta(seconds=config.RESULT_TTL), func=clear_files_for_job, args=(job_id,))
+    res = {"job_id": job_id, "url": f"/results/{job_id}"}
+    return TaskPostResult(**res)
     
-@app.route('/pca')
-def pca():
-    return check_file_and_run_task(request, run_pca)
+@app.post('/pca', response_model=TaskPostResult)
+def pca(params: PCAParams):
+    params_dict = params.dict()
+    job_id = generate_id()
+    params_dict['job_id'] = job_id
+    job = queue.enqueue_call(func=run_pca, args=(params_dict,), result_ttl=config.RESULT_TTL, job_id=job_id)
+    job_clear_files = queue.enqueue_in(timedelta(seconds=config.RESULT_TTL), func=clear_files_for_job, args=(job_id,))
+    res = {"job_id": job_id, "url": f"/results/{job_id}"}
+    return TaskPostResult(**res)
     
-@app.route('/hca')
-def hca():
-    return check_file_and_run_task(request, run_hca)
+@app.post('/hca', response_model=TaskPostResult)
+def hca(params: HCAParams):
+    params_dict = params.dict()
+    job_id = generate_id()
+    params_dict['job_id'] = job_id
+    job = queue.enqueue_call(func=run_hca, args=(params_dict,), result_ttl=config.RESULT_TTL, job_id=job_id)
+    job_clear_files = queue.enqueue_in(timedelta(seconds=config.RESULT_TTL), func=clear_files_for_job, args=(job_id,))
+    res = {"job_id": job_id, "url": f"/results/{job_id}"}
+    return TaskPostResult(**res)
     
-@app.route('/stats')
-def stats():
-    return check_file_and_run_task(request, run_stats)
-    
-@app.route('/linear')
-def linear():
-    return check_file_and_run_task(request, run_linear)
-    
-@app.route('/test_file')
-def test_file():
-    return send_from_directory(Path().cwd(), 'data.csv', as_attachment=True, cache_timeout=0) 
-
-@app.route('/test')
-def test():
-    return jsonify({'success': True, 'results': ['Test Data']})
-
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({'success': False, 'error': 'Not found'}), 404
-
-
-if __name__ == '__main__':
-    app.run(threaded=True, port=5000)
+@app.post('/linear', response_model=TaskPostResult)
+def linear(params: LinearParams):
+    params_dict = params.dict()
+    job_id = generate_id()
+    params_dict['job_id'] = job_id
+    job = queue.enqueue_call(func=run_linear, args=(params_dict,), result_ttl=config.RESULT_TTL, job_id=job_id)
+    job_clear_files = queue.enqueue_in(timedelta(seconds=config.RESULT_TTL), func=clear_files_for_job, args=(job_id,))
+    res = {"job_id": job_id, "url": f"/results/{job_id}"}
+    return TaskPostResult(**res)
