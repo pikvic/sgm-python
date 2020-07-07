@@ -1,3 +1,4 @@
+import logging
 import re
 import seaborn as sns
 import pandas as pd
@@ -13,6 +14,7 @@ from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import AgglomerativeClustering
 import config
 
+logging.basicConfig(filename='tasks.log', filemode='w', level=logging.DEBUG)
 
 def clear_files_for_job(job_id):
     path = config.UPLOAD_DIR / job_id
@@ -27,28 +29,34 @@ def clear_files_for_job(job_id):
         path.rmdir()
 
 def get_or_create_dir(root, job_id):
+    logging.DEBUG("Get or create dir")
     path = root / job_id
     if not path.exists():
         path.mkdir()
     return path
 
 def upload_file(url, job_id):
+    logging.DEBUG(f"Upload file: {url}, {job_id}")
     try:
         root = get_or_create_dir(config.UPLOAD_DIR, job_id)
-        print(root)
-        print(list(config.UPLOAD_DIR.iterdir()))
+        logging.DEBUG(f'Root: {root}')
+        logging.DEBUG(f'Dirs: {list(config.UPLOAD_DIR.iterdir())}')
         res = requests.get(url)
-        print(res)
+        logging.DEBUG(f'Res: {res}')
+
         if res.ok:
             name = url.split('/')[-1]
-            print(name)
+            logging.DEBUG(f'Name: {name}')
             with open(root / name, 'wb') as f:
                 f.write(res.content)
-            print('write')
+            logging.DEBUG(f'Writed!')
         else:
+            logging.DEBUG(f'Exception!')
             raise Exception
     except:
+        logging.DEBUG(f'Except')
         return {'success': False, 'error': f'Can not upload file from {url}'}
+    logging.DEBUG(f'Success')
     return {'success': True, 'file_path': f'{root / name}'}
 
 def check_file(filename):
@@ -82,6 +90,7 @@ def get_dataframe(filename, file_format):
     return {'success': True, 'dataframe': df}
 
 def validate_input_and_get_dataframe(url, job_id):
+    logging.DEBUG("Validate Input")
     res = upload_file(url, job_id)
     if not res['success']:
         return res
@@ -96,6 +105,7 @@ def validate_input_and_get_dataframe(url, job_id):
 
 def run_stats(params):
     # common
+    logging.DEBUG("Run stats started")
     results = []
     job_id = params['job_id']
     res = validate_input_and_get_dataframe(params['url'], job_id)

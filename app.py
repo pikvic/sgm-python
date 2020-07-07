@@ -22,7 +22,7 @@ class StatsTaskParams(BaseModel):
 class KMeansParams(BaseModel):
     url: HttpUrl
     nclusters: int = 6
-    randomstate: int = 0
+    randomstate: Optional[int] = 0
     exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
     addresultcolumns: Optional[bool] = False
     showstats: Optional[bool] = False
