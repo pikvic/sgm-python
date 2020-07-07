@@ -1,4 +1,3 @@
-import logging
 import re
 import seaborn as sns
 import pandas as pd
@@ -14,7 +13,28 @@ from scipy.cluster.hierarchy import dendrogram
 from sklearn.cluster import AgglomerativeClustering
 import config
 
-logging.basicConfig(filename='tasks.log', filemode='w', level=logging.DEBUG)
+
+import logging
+import sys
+from logging.handlers import TimedRotatingFileHandler
+
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — %(levelname)s — %(message)s")
+LOG_FILE = "my_app.log"
+
+def get_file_handler():
+   file_handler = TimedRotatingFileHandler(LOG_FILE, when='midnight')
+   file_handler.setFormatter(FORMATTER)
+   return file_handler
+
+def get_logger(logger_name):
+   logger = logging.getLogger(logger_name)
+   logger.setLevel(logging.DEBUG) # better to have too much log than not enough
+   logger.addHandler(get_file_handler())
+   # with this pattern, it's rarely necessary to propagate the error up to parent
+   logger.propagate = False
+   return logger
+
+my_logger = get_logger("my module name")
 
 def clear_files_for_job(job_id):
     path = config.UPLOAD_DIR / job_id
@@ -29,34 +49,34 @@ def clear_files_for_job(job_id):
         path.rmdir()
 
 def get_or_create_dir(root, job_id):
-    logging.DEBUG("Get or create dir")
+    my_logger.debug("Get or create dir")
     path = root / job_id
     if not path.exists():
         path.mkdir()
     return path
 
 def upload_file(url, job_id):
-    logging.DEBUG(f"Upload file: {url}, {job_id}")
+    my_logger.debug(f"Upload file: {url}, {job_id}")
     try:
         root = get_or_create_dir(config.UPLOAD_DIR, job_id)
-        logging.DEBUG(f'Root: {root}')
-        logging.DEBUG(f'Dirs: {list(config.UPLOAD_DIR.iterdir())}')
+        my_logger.debug(f'Root: {root}')
+        my_logger.debug(f'Dirs: {list(config.UPLOAD_DIR.iterdir())}')
         res = requests.get(url)
-        logging.DEBUG(f'Res: {res}')
+        my_logger.debug(f'Res: {res}')
 
         if res.ok:
             name = url.split('/')[-1]
-            logging.DEBUG(f'Name: {name}')
+            my_logger.debug(f'Name: {name}')
             with open(root / name, 'wb') as f:
                 f.write(res.content)
-            logging.DEBUG(f'Writed!')
+            my_logger.debug(f'Writed!')
         else:
-            logging.DEBUG(f'Exception!')
+            my_logger.debug(f'Exception!')
             raise Exception
     except:
-        logging.DEBUG(f'Except')
+        my_logger.debug(f'Except')
         return {'success': False, 'error': f'Can not upload file from {url}'}
-    logging.DEBUG(f'Success')
+    my_logger.debug(f'Success')
     return {'success': True, 'file_path': f'{root / name}'}
 
 def check_file(filename):
@@ -90,7 +110,7 @@ def get_dataframe(filename, file_format):
     return {'success': True, 'dataframe': df}
 
 def validate_input_and_get_dataframe(url, job_id):
-    logging.DEBUG("Validate Input")
+    my_logger.debug("Validate Input")
     res = upload_file(url, job_id)
     if not res['success']:
         return res
@@ -105,7 +125,7 @@ def validate_input_and_get_dataframe(url, job_id):
 
 def run_stats(params):
     # common
-    logging.DEBUG("Run stats started")
+    my_logger.debug("Run stats started")
     results = []
     job_id = params['job_id']
     res = validate_input_and_get_dataframe(params['url'], job_id)

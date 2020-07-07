@@ -13,6 +13,7 @@ from uuid import uuid4
 from tasks import run_stats, clear_files_for_job, run_kmeans, run_hca, run_linear, run_pca
 import config
 
+
 class StatsTaskParams(BaseModel):
     url: HttpUrl
     column: int = Field(..., gt=0)
@@ -52,6 +53,7 @@ class TaskPostResult(BaseModel):
 class TaskResult(BaseModel):
     ready: bool = False
     results: List[str] = None
+
 
 
 app = FastAPI()
