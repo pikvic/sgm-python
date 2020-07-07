@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-ROOT = Path()
+ROOT =  Path(os.getenv('HOME', '.'))
 UPLOAD_DIR = ROOT / 'upload'
 DOWNLOAD_DIR = ROOT / 'download'
 RESULT_TTL = 600
