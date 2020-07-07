@@ -63,6 +63,10 @@ if not config.UPLOAD_DIR.exists():
 if not config.DOWNLOAD_DIR.exists():
     config.DOWNLOAD_DIR.mkdir()
 
+print(config.UPLOAD_DIR)
+print(config.DOWNLOAD_DIR)
+print([str(d) for d in config.ROOT.iterdir()])
+
 def generate_id():
     return str(uuid4())
 
