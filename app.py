@@ -86,15 +86,16 @@ def jobs_list():
 def get_result(job_id):
     try:
         job = Job.fetch(job_id, connection=red)
-        if job.is_finished:
-            res = job.result
-            if 'error' in res:
-                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=res['error'])
-            return TaskResult(**res)
-        else:
-            return TaskResult(ready=False)
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Task not found!')
+    if job.is_finished:
+        res = job.result
+        if 'error' in res:
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=res['error'])
+        return TaskResult(**res)
+    else:
+        return TaskResult(ready=False)
+
 
 @app.get("/download/{job_id}/{filename}")
 def get_file(job_id, filename):
