@@ -1,6 +1,6 @@
 import redis
 from rq import Worker, Queue, Connection
-import config
+import app.core.config as config
 
 listen = ['default']
 
