@@ -1,0 +1,9 @@
+.git
+.gitignore
+Procfile
+README.md
+.vscode
+__pycache__
+venv
+download
+upload
