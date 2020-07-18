@@ -20,7 +20,7 @@ services:
   worker:
     image: web
     environment: 
-      - REDIS_URL="redis://redis:6379/0"
+      - REDIS_URL=redis://redis:6379/0
     command: rq worker --url redis://redis:6379/0 --with-scheduler
     volumes:
       - .:/usr/src/app
