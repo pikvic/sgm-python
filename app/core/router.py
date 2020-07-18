@@ -4,6 +4,7 @@ from rq.job import Job
 
 import app.core.config as config
 from app.core.schema import TaskResult
+from app.core.queue import get_queue, get_redis
 
 router = APIRouter()
 
