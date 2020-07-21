@@ -44,7 +44,6 @@ tags_metadata = [
     # },
 ]
 
-
 app = FastAPI(
     title='Вычислительный узел "Многомерный анализ данных"',
     description="Данный вычислительный узел содержит API для различных процедур многомерного анализа данных",
@@ -53,6 +52,11 @@ app = FastAPI(
 )
 
 app.include_router(router_core, tags=["core"])
+
+if config.DEBUG:
+    from app.methods.test.router import router as router_test
+    app.include_router(router_test, prefix="/test", tags=["test"])
+
 app.include_router(router_statistics, prefix="/statistics", tags=["statistics"])
 app.include_router(router_clustering, prefix="/clustering", tags=["clustering"])
 app.include_router(router_factor, prefix="/factor", tags=["factor"])
@@ -60,6 +64,9 @@ app.include_router(router_regression, prefix="/regression", tags=["regression"])
 #app.include_router(router_clustering, prefix="/classification", tags=["classification"])
 #app.include_router(router_visual, prefix="/visual", tags=["visual"])
 
+from app.methods.router import router as router_methods
+
+app.include_router(router_methods, prefix="/methods", tags=["methods"])
 
 if not config.UPLOAD_DIR.exists():
     config.UPLOAD_DIR.mkdir()

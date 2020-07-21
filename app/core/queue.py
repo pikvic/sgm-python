@@ -27,3 +27,43 @@ def get_redis():
 
 def get_queue():
     return queue
+
+def get_jobs_by_ids(queue, job_ids):
+    jobs = []
+    for job_id in job_ids:
+        job = queue.fetch_job(job_id)
+        job_dict = {
+            'id': job.id, 
+            'funcname': job.func_name, 
+            'status': job.get_status(),
+            'enqueued_at': job.enqueued_at,
+            'started_at': job.started_at,
+            'ended_at': job.ended_at,
+            'result': job.result,
+            'args': job.args,
+            'kwargs': job.kwargs,
+            'error': job.exc_info
+        }
+        jobs.append(job_dict)
+    return jobs
+
+def get_jobs_in_registries():
+    q = get_queue()
+    jobs_dict = {}
+    
+    ids_dict = {
+        'enqueued': q.get_job_ids(),
+        'started': q.started_job_registry.get_job_ids(),
+        'finished': q.finished_job_registry.get_job_ids(),
+        'failed': q.failed_job_registry.get_job_ids(),
+        'scheduled': q.scheduled_job_registry.get_job_ids(),
+        'deferred': q.deferred_job_registry.get_job_ids()
+    }
+
+    for status, job_ids in ids_dict.items():
+        jobs = get_jobs_by_ids(q, job_ids)
+        jobs_dict[status] = jobs
+
+    return jobs_dict
+
+

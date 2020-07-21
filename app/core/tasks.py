@@ -76,3 +76,13 @@ def validate_input_and_get_dataframe(url, job_id):
     if not res['success']:
         return res
     return res
+
+def generate_filename(path, prefix, name):
+    return path / f'{prefix}_{name}'
+
+def error(message):
+    return {'success': False, 'error': message}
+
+def ready(results):
+    return {'ready': True, 'results': results}
+    

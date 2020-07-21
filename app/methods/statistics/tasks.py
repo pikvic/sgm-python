@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import app.core.config as config
-from app.core.tasks import validate_input_and_get_dataframe, get_or_create_dir
+from app.core.tasks import validate_input_and_get_dataframe, get_or_create_dir, generate_filename, error, ready
 
 def run_stats(params):
     # common
@@ -21,20 +21,20 @@ def run_stats(params):
         column = params['column'] - 1
         data = df.iloc[:, column]
     except:
-        return {'success': False, 'error': 'Wrong column parameter!'}
+        return error('Wrong column parameter!')
     stats = data.describe()
     stats.index.name = "Stats"
+
+    file_path = generate_filename(root, 'stats', 'output.csv')
     
     try:
-        output = 'result.csv'
-        file_path = root / output
         if params['transpose']:
             stats.T.to_csv(file_path)
         else:
             stats.to_csv(file_path)
         results.append(str(file_path))
     except:
-        return {'success': False, 'error': 'Error while saving result!'}
+        return error('Error while saving result!')
 
     if params['showgraph']:
         try:
@@ -51,3 +51,4 @@ def run_stats(params):
         except:
             return {'success': False, 'error': 'Error while showing graph!'}
     return {'ready': True, 'results': results}
+

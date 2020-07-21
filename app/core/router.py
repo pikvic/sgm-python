@@ -4,7 +4,7 @@ from rq.job import Job
 
 import app.core.config as config
 from app.core.schema import TaskResult
-from app.core.queue import get_queue, get_redis
+from app.core.queue import get_queue, get_redis, get_jobs_in_registries
 
 router = APIRouter()
 
@@ -18,18 +18,11 @@ def root():
 
 @router.get(
     "/jobs",
-    summary="Получение списка выполненных задач",
-    description="Возвращает список выполненных задач."
+    summary="Получение списка всех задач",
+    description="Возвращает список всех задач."
 )
 def jobs_list():
-    queue = get_queue()
-    job_ids = queue.finished_job_registry.get_job_ids()
-    jobs = []
-    for job_id in job_ids:
-        job = queue.fetch_job(job_id)
-        jobs.append({'id': job.id, 'funcname': job.func_name, 'status': job.get_status()})
-    res = {'jobs': jobs}
-    return res
+    return get_jobs_in_registries()
 
 @router.get(
     "/results/{job_id}", 

@@ -7,7 +7,7 @@ services:
     image: web
     container_name: web
     ports:
-      - 80:5000
+      - 8000:5000
     environment: 
       - REDIS_URL=redis://redis:6379
     command: uvicorn app.main:app --host 0.0.0.0 --port 5000
