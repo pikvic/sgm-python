@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 import app.core.config as config
 from app.core.tasks import validate_input_and_get_dataframe, get_or_create_dir
 
@@ -39,8 +40,8 @@ def run_linear(params):
         file_path = root / 'result.csv'
         pd.DataFrame(res).to_csv(file_path, index=False)
         results.append(str(file_path))
-    except:
-        return {'success': False, 'error': 'Error while saving result!'}
+    except Exception as e:
+        return {'success': False, 'error': f'Error while saving result! Exception: {e}'}
 
     try:
         fig, ax = plt.subplots()
