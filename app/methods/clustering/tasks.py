@@ -162,6 +162,6 @@ def run_hca(params):
         file_path = root / 'hca_figure_1.png'
         fig.savefig(file_path, bbox_inches = 'tight')
         results.append(str(file_path))
-    except:
-        return {'success': False, 'error': 'Error while showing graph!'}
+    except Exception as e:
+        return {'success': False, 'error': f'Error while showing graph! {e}'}
     return {'ready': True, 'results': results}
