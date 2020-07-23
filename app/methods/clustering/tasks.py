@@ -152,7 +152,7 @@ def run_hca(params):
         results.append(str(file_path))
     except:
         return {'success': False, 'error': 'Error while saving result!'}
-
+    params['levels'] = 4
     try:
         fig, ax = plt.subplots()
         plot_dendrogram(model, truncate_mode='level', p=params['levels'], ax=ax)
@@ -163,5 +163,5 @@ def run_hca(params):
         fig.savefig(file_path, bbox_inches = 'tight')
         results.append(str(file_path))
     except Exception as e:
-        return {'success': False, 'error': f'Error while showing graph! {e}'}
+        return {'success': False, 'error': f'Error while showing graph! Exception: {e}'}
     return {'ready': True, 'results': results}

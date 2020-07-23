@@ -2,6 +2,9 @@ import seaborn as sns
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import re
 
 import app.core.config as config
 from app.core.tasks import validate_input_and_get_dataframe, get_or_create_dir
@@ -37,8 +40,8 @@ def run_pca(params):
             data = df.iloc[:, columns]
         else:
             data = df.iloc[:, :]        
-    except:
-        return {'success': False, 'error': 'Error while excluding columns!'}    
+    except Exception as e:
+        return {'success': False, 'error': f'Error while excluding columns! Exception: {e}'}    
 
     columns = data.columns
     if params['normalize']:
@@ -59,8 +62,8 @@ def run_pca(params):
         pd.DataFrame({'Explained Variance': pca.explained_variance_,
                 'Explained Variance Ratio': pca.explained_variance_ratio_}).to_csv(file_path, index=False)
         results.append(str(file_path))
-    except:
-        return {'success': False, 'error': 'Error while saving result!'}    
+    except Exception as e:
+        return {'success': False, 'error': f'Error while saving result! Exception: {e}'}    
 
     params['showgraph'] = True
     if params['showgraph']:
