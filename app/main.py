@@ -61,7 +61,7 @@ if config.DEBUG:
     
 
 app.include_router(router_legacy)
-app.include_router(router_api, prefix="/api/v1/methods")
+app.include_router(router_api, prefix="/api/v1")
 #app.include_router(router_statistics, prefix="/statistics", tags=["statistics"])
 #app.include_router(router_clustering, prefix="/clustering", tags=["clustering"])
 #app.include_router(router_factor, prefix="/factor", tags=["factor"])

@@ -1,4 +1,25 @@
-from app.core.schema import MethodInfo
+from app.core.schema import MethodInfo, Group
+
+GROUPS = [
+    Group(
+        title='Описательная статистика',
+        description='Группа методов для исследования входных наборов данных на предмет основных статистических показателей, распределений и др.',
+        image='https://ocw.mit.edu/courses/sloan-school-of-management/15-075j-statistical-thinking-and-data-analysis-fall-2011/15-075f11.jpg',
+        methods=['summary', 'histogram', 'boxplot']
+    ),
+    Group(
+        title='Корреляционный анализ',
+        description='Группа методов для поиска закономерностей в данных.',
+        image='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSKOb5EmFODVKcwiUSp8cnCKs47gFzTJhFk7Q&usqp=CAU',
+        methods=['corrmatrix', 'scatterplot']
+    ),
+    Group(
+        title='Кластерный анализ',
+        description='Методы поиска групп в исходных данных.',
+        image='https://img.pngio.com/r-script-showcase-microsoft-power-bi-community-clustering-png-300_173.png',
+        methods=['kmeans', 'kmeansscreeplot']
+    )
+]
 
 METHODS = {
     'summary': MethodInfo(

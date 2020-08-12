@@ -33,3 +33,9 @@ class MethodInfo(BaseModel):
     title: str
     description: str
     image: HttpUrl
+
+class Group(BaseModel):
+    title: str
+    description: str
+    image: HttpUrl
+    methods: List[str]
