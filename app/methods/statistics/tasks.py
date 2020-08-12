@@ -38,20 +38,20 @@ def run_summary(params):
         return error('Error while saving result!')
     
     # make fig
-    if params.get('showgraph'):
-        try:
-            sns.set_style("whitegrid")
-            sns.set_context("talk")
-            fig, ax = plt.subplots(2, 1, figsize=(6, 10))
-            sns.distplot(data, ax=ax[0])
-            sns.boxplot(data, ax=ax[1])
-            figname = f'Column_{column + 1}.png'
-            file_path = root / figname
-            fig.savefig(file_path, bbox_inches = 'tight')
-            results.append(str(file_path))
-            plt.close(fig)
-        except:
-            return {'success': False, 'error': 'Error while showing graph!'}
+
+    try:
+        sns.set_style("whitegrid")
+        sns.set_context("talk")
+        fig, ax = plt.subplots(2, 1, figsize=(6, 10))
+        sns.distplot(data, ax=ax[0])
+        sns.boxplot(data, ax=ax[1])
+        figname = f'Column_{column + 1}.png'
+        file_path = root / figname
+        fig.savefig(file_path, bbox_inches = 'tight')
+        results.append(str(file_path))
+        plt.close(fig)
+    except:
+        return {'success': False, 'error': 'Error while showing graph!'}
     return {'ready': True, 'results': results}
 
 
