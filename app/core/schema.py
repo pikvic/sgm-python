@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import List, Optional
 from pydantic import BaseModel, Field, HttpUrl
 
@@ -13,7 +13,7 @@ class ImageFormatEnum(str, Enum):
     TIFF = 'TIFF'
     SVG = 'SVG'
 
-class ImageDpiEnum(Enum):
+class ImageDpiEnum(IntEnum):
     DPI_150 = 150
     DPI_300 = 300
     DPI_600 = 600

@@ -1,19 +1,31 @@
 from typing import Optional
 from pydantic import BaseModel, Field, HttpUrl
+from app.core.schema import ImageFormatEnum, ImageDpiEnum, FileFormatEnum
 
 
-class KMeansParams(BaseModel):
+class StatsTaskParams(BaseModel):
     url: HttpUrl
-    nclusters: int = 6
-    randomstate: Optional[int] = 0
-    exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
-    addresultcolumns: Optional[bool] = False
-    showstats: Optional[bool] = False
-    normalize: Optional[bool] = False
+    column: int = Field(..., gt=0)
+    transpose: Optional[bool] = False
     showgraph: Optional[bool] = False
 
-
-class HCAParams(BaseModel):
+class SummaryTaskParams(BaseModel):
     url: HttpUrl
-    exclude: Optional[str] = Field(None, regex=r'^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$')
-    normalize: Optional[bool] = False
+    columns: str = Field(..., regex=r'(^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$)|(^\*$)', title='Столбцы для расчёта', description='Пример: 2-4,6,8')
+    file_format: FileFormatEnum = Field(FileFormatEnum.CSV, title='Формат выходных табличных файлов')
+    image_format: ImageFormatEnum = Field(ImageFormatEnum.JPG, title='Формат выходных изображений')
+    image_dpi: ImageDpiEnum = Field(ImageDpiEnum.DPI_300, title='Качество выходных изображений (DPI)')
+
+class HistorgamTaskParams(BaseModel):
+    url: HttpUrl
+    columns: str = Field(..., regex=r'(^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$)|(^\*$)', title='Столбцы для расчёта', description='Пример: 2-4,6,8')
+    file_format: FileFormatEnum = Field(FileFormatEnum.CSV, title='Формат выходных табличных файлов')
+    image_format: ImageFormatEnum = Field(ImageFormatEnum.JPG, title='Формат выходных изображений')
+    image_dpi: ImageDpiEnum = Field(ImageDpiEnum.DPI_300, title='Качество выходных изображений (DPI)')
+
+class BoxplotTaskParams(BaseModel):
+    url: HttpUrl
+    columns: str = Field(..., regex=r'(^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$)|(^\*$)', title='Столбцы для расчёта', description='Пример: 2-4,6,8')
+    file_format: FileFormatEnum = Field(FileFormatEnum.CSV, title='Формат выходных табличных файлов')
+    image_format: ImageFormatEnum = Field(ImageFormatEnum.JPG, title='Формат выходных изображений')
+    image_dpi: ImageDpiEnum = Field(ImageDpiEnum.DPI_300, title='Качество выходных изображений (DPI)')

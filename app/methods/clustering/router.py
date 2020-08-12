@@ -1,34 +1,58 @@
 from typing import Optional
 from starlette import status
 from fastapi import APIRouter
-
-from app.core.schema import TaskPostResult
+from app.core.schema import TaskPostResult, MethodInfo
 from app.core.queue import create_task
-
-from .schema import KMeansParams, HCAParams
-from .tasks import run_kmeans, run_hca
+from .schema import SummaryTaskParams, HistorgamTaskParams, BoxplotTaskParams
+from .tasks import run_summary, run_histogram, run_boxplot
+from app.methods.methods import METHODS
 
 router = APIRouter()
 
-@router.post(
-    "/kmeans",
-    status_code=status.HTTP_201_CREATED,
-    response_model=TaskPostResult,
-    summary="Метод К-средних",
-    description="Кластеризация методом К-средних"
-)
-def kmeans(params: KMeansParams):
-    res = create_task(run_kmeans, params.dict())
-    return TaskPostResult(**res)
+# kmeans
+# kmeansscreeplot
 
 @router.post(
-    "/hca",
+    "/kmeansscreeplot",
     status_code=status.HTTP_201_CREATED,
-    response_model=TaskPostResult,
-    summary="Метод иерархического кластерного анализа",
-    description="Кластеризация методом иерархического кластерного анализа"
+    response_model=TaskPostResult
 )
-def hca(params: HCAParams):
-    res = create_task(run_hca, params.dict())
+def summary_post(params: SummaryTaskParams):
+    res = create_task(run_summary, params.dict())
     return TaskPostResult(**res)
 
+@router.get(
+    "/kmeansscreeplot"
+)
+def summary_get():
+    return METHODS['summary']
+
+@router.post(
+    "/histogram",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TaskPostResult
+)
+def histogram_post(params: HistorgamTaskParams):
+    res = create_task(run_histogram, params.dict())
+    return TaskPostResult(**res)
+
+@router.get(
+    "/histogram"
+)
+def histogram_get():
+    return METHODS['histogram']
+
+@router.post(
+    "/boxplot",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TaskPostResult
+)
+def boxplot_post(params: BoxplotTaskParams):
+    res = create_task(run_boxplot, params.dict())
+    return TaskPostResult(**res)
+
+@router.get(
+    "/boxplot"
+)
+def boxplot_get():
+    return METHODS['boxplot']

@@ -77,6 +77,47 @@ def validate_input_and_get_dataframe(url, job_id):
         return res
     return res
 
+def parse_columns(param, ncolumns):
+    pattern = r'(^\d+(-\d+)?(?:,\d+(?:-\d+)?)*$)|(^\*$)'
+    pattern_all = r'^\*$'
+    if not re.search(pattern, param):
+        return {'success': False, 'error': 'Неверный формат указания столбцов для обработки'}
+    if re.search(pattern_all, param):
+        return {'success': True, 'data': list(range(ncolumns))}
+    
+    res = re.findall(r'\d+(?:-\d+)*', param)
+    columns = set()
+    for r in res:
+        if '-' in r:
+            left, right = int(r.split('-')[0]), int(r.split('-')[1])
+            if left < right:
+                if left > ncolumns or right > ncolumns:
+                    return {'success': False, 'error': 'Указанные номера столбцов больше, чем есть во входном файле'}
+                columns = columns | set(range(left - 1, right))
+        else:
+            col = int(r)
+            if col > ncolumns:
+                return {'success': False, 'error': 'Указанные номера столбцов больше, чем есть во входном файле'}
+
+            columns.add(col - 1)
+    columns = sorted(list(columns))
+    return {'success': True, 'data': columns}
+
+def validate_columns_params(params, ncolumns):
+    if 'columns' in params:
+        res = parse_columns(params['columns'], ncolumns)
+        if not res['success']:
+            return res
+    if 'columns1' in params:
+        res = parse_columns(params['columns1'], ncolumns)
+        if not res['success']:
+            return res
+    if 'columns2' in params:
+        res = parse_columns(params['columns2'], ncolumns)
+        if not res['success']:
+            return res
+    return {'success': True}
+
 def generate_filename(path, prefix, name):
     return path / f'{prefix}_{name}'
 

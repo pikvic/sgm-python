@@ -36,5 +36,19 @@ METHODS = {
         name='scatterplot',
         image='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTdme_orKceyOsu6WIw2XL92DOpK4gZo19sVg&usqp=CAU'
     ),
+    'kmeans': MethodInfo(
+        group='Кластерный анализ',
+        title='Метод k-средних',
+        description='Кластеризация входных данных методом k-средних.',
+        name='scatterplot',
+        image='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRpg-UkIRFomhPvbHkXizOfXznb9S1FQbv7pw&usqp=CAU'
+    ),
+    'kmeansscreeplot': MethodInfo(
+        group='Кластерный анализ',
+        title='Выбор количества кластеров (каменистая осыпь)',
+        description='Построение графика каменистой осыпи для количества кластеров в исходных данных по методу k-средних. Позволяет определить оптимальное количество кластеров.',
+        name='kmeansscreeplot',
+        image='https://www.researchgate.net/profile/Chirag_Deb/publication/320986519/figure/fig8/AS:560163938422791@1510564898246/Result-of-the-elbow-method-to-determine-optimum-number-of-clusters.png'
+    ),
 }
     
