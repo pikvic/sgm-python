@@ -31,7 +31,7 @@ def upload_file(url, job_id):
             with open(root / name, 'wb') as f:
                 f.write(res.content)
     except Exception as e:
-        return {'success': False, 'error': f'Can not upload file from {url}. Exception: {e}'}
+        return {'success': False, 'error': f'Невозможно скачать файл {url}'}
     return {'success': True, 'file_path': f'{root / name}'}
 
 def check_file(filename):
@@ -51,7 +51,7 @@ def check_file(filename):
         except Exception as e:
             error = True 
     if error:
-        return {'success': False, 'error': 'Wrong file format! Excel or csv excepted.'}
+        return {'success': False, 'error': 'Неверный формат входного файла'}
     return {'success': True, 'file_format': file_format}
 
 def get_dataframe(filename, file_format):
@@ -61,7 +61,7 @@ def get_dataframe(filename, file_format):
         elif file_format == 'csv':
             df = pd.read_csv(filename)
     except:
-        return {'success': False, 'error': 'Can not get dataframe!'}
+        return {'success': False, 'error': 'Неправильная структура таблиц в файле'}
     return {'success': True, 'dataframe': df}
 
 def validate_input_and_get_dataframe(url, job_id):

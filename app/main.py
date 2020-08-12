@@ -5,10 +5,12 @@ import app.core.config as config
 from app.core.queue import get_queue, get_redis, create_task
 
 from app.core.router import router as router_core
-from app.methods.statistics.router import router as router_statistics
-from app.methods.clustering.router import router as router_clustering
-from app.methods.factor.router import router as router_factor
-from app.methods.regression.router import router as router_regression
+from app.methods.router_api import router_api
+from app.methods.legacy.router import router as router_legacy
+#from app.methods.statistics.router import router as router_statistics
+#from app.methods.clustering.router import router as router_clustering
+#from app.methods.factor.router import router as router_factor
+#from app.methods.regression.router import router as router_regression
 #from app.methods.classification.router import router as router_classification
 #from app.methods.visual.router import router as router_visual
 
@@ -55,17 +57,18 @@ app.include_router(router_core, tags=["core"])
 
 if config.DEBUG:
     from app.methods.test.router import router as router_test
-    app.include_router(router_test, prefix="/test", tags=["test"])
+    app.include_router(router_test, prefix= "/test", tags=["test"])
+    
 
-app.include_router(router_statistics, prefix="/statistics", tags=["statistics"])
-app.include_router(router_clustering, prefix="/clustering", tags=["clustering"])
-app.include_router(router_factor, prefix="/factor", tags=["factor"])
-app.include_router(router_regression, prefix="/regression", tags=["regression"])
+app.include_router(router_legacy)
+app.include_router(router_api, prefix="/api/v1/methods")
+#app.include_router(router_statistics, prefix="/statistics", tags=["statistics"])
+#app.include_router(router_clustering, prefix="/clustering", tags=["clustering"])
+#app.include_router(router_factor, prefix="/factor", tags=["factor"])
+#app.include_router(router_regression, prefix="/regression", tags=["regression"])
 #app.include_router(router_clustering, prefix="/classification", tags=["classification"])
 #app.include_router(router_visual, prefix="/visual", tags=["visual"])
-
 #from app.methods.router import router as router_methods
-
 #app.include_router(router_methods, prefix="/methods", tags=["methods"])
 
 if not config.UPLOAD_DIR.exists():

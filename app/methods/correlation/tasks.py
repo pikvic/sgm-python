@@ -55,8 +55,8 @@ def run_summary(params):
     return {'ready': True, 'results': results}
 
 
-def run_histogram(params):
+def run_corrmatrix(params):
     return run_summary
 
-def run_boxplot(params):
+def run_scatterplot(params):
     return run_summary
