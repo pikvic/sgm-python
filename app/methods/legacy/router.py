@@ -6,7 +6,7 @@ from app.core.schema import TaskPostResult
 from app.core.queue import create_task
 
 from .schema import LinearParams, HCAParams, PCAParams, KMeansParams, StatsTaskParams
-from .tasks import run_linear
+from .tasks import run_linear, run_hca, run_kmeans, run_pca, run_stats
 
 router = APIRouter()
 
