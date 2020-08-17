@@ -20,36 +20,15 @@ tags_metadata = [
         "description": "Служебные операции для работы с задачами, скачиванием результатов и т.д."
     },
     {
-        "name": "statistics",
-        "description": "Статистический анализ"
-    },
-  
-    {
-        "name": "clustering",
-        "description": "Кластерный анализ"
-    },
-    {
-        "name": "factor",
-        "description": "Факторный анализ"
-    },
-    {
-        "name": "regression",
-        "description": "Регрессионный анализ"
-    },
-    # {
-    #     "name": "visual",
-    #     "description": "Визуальный анализ"
-    # },
-    #  {
-    #     "name": "classification",
-    #     "description": "Классификационный анализ"
-    # },
+        "name": "methods",
+        "description": "Методы анализа данных"
+    }
 ]
 
 app = FastAPI(
     title='Вычислительный узел "Многомерный анализ данных"',
     description="Данный вычислительный узел содержит API для различных процедур многомерного анализа данных",
-    version="0.1",
+    version="0.2",
     openapi_tags=tags_metadata,
 )
 
@@ -62,14 +41,6 @@ if config.DEBUG:
 
 app.include_router(router_legacy)
 app.include_router(router_api, prefix="/api/v1")
-#app.include_router(router_statistics, prefix="/statistics", tags=["statistics"])
-#app.include_router(router_clustering, prefix="/clustering", tags=["clustering"])
-#app.include_router(router_factor, prefix="/factor", tags=["factor"])
-#app.include_router(router_regression, prefix="/regression", tags=["regression"])
-#app.include_router(router_clustering, prefix="/classification", tags=["classification"])
-#app.include_router(router_visual, prefix="/visual", tags=["visual"])
-#from app.methods.router import router as router_methods
-#app.include_router(router_methods, prefix="/methods", tags=["methods"])
 
 if not config.UPLOAD_DIR.exists():
     config.UPLOAD_DIR.mkdir()
