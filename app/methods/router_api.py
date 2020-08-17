@@ -7,14 +7,13 @@ from app.methods.methods import GROUPS, METHODS
 
 router_api = APIRouter()
 
-@router_api.get('/methods')
+@router_api.get('/methods', tags=['info'])
 def methods():
     return METHODS
 
-@router_api.get('/groups')
+@router_api.get('/groups', tags=['info'])
 def groups():
     return GROUPS
-
 
 router_api.include_router(statistics_router, prefix='/methods', tags=['methods'])
 router_api.include_router(correlation_router, prefix='/methods', tags=['methods'])

@@ -7,12 +7,7 @@ from app.core.queue import get_queue, get_redis, create_task
 from app.core.router import router as router_core
 from app.methods.router_api import router_api
 from app.methods.legacy.router import router as router_legacy
-#from app.methods.statistics.router import router as router_statistics
-#from app.methods.clustering.router import router as router_clustering
-#from app.methods.factor.router import router as router_factor
-#from app.methods.regression.router import router as router_regression
-#from app.methods.classification.router import router as router_classification
-#from app.methods.visual.router import router as router_visual
+
 
 tags_metadata = [
     {
@@ -21,8 +16,13 @@ tags_metadata = [
     },
     {
         "name": "methods",
-        "description": "Методы анализа данных"
+        "description": "Методы анализа данных и информация о них"
+    },
+    {
+        "name": "info",
+        "description": "Списки методов и групп методов с информацией о них"
     }
+
 ]
 
 app = FastAPI(
