@@ -32,7 +32,7 @@ class MethodInfo(BaseModel):
     name: str
     title: str
     description: str
-    image: HttpUrl
+    image: str
 
 class Group(BaseModel):
     title: str

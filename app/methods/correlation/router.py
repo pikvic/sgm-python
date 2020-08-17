@@ -1,6 +1,8 @@
 from typing import Optional
 from starlette import status
 from fastapi import APIRouter
+from fastapi import Request
+
 from app.core.schema import TaskPostResult, MethodInfo
 from app.core.queue import create_task
 from .schema import CorrmatrixTaskParams, ScatterplotTaskParams
@@ -14,14 +16,17 @@ router = APIRouter()
     status_code=status.HTTP_201_CREATED,
     response_model=TaskPostResult
 )
-def corrmatrix_post(params: CorrmatrixTaskParams):
+def corrmatrix_post(params: CorrmatrixTaskParams, request: Request):
     res = create_task(run_corrmatrix, params.dict())
+    res['url'] = request.url_for('get_result', job_id=res['job_id'])
     return TaskPostResult(**res)
 
 @router.get(
     "/corrmatrix"
 )
-def corrmatrix_get():
+def corrmatrix_get(request: Request):
+    res = METHODS['scatterplot']
+    res.image = str(request.base_url) + res.image
     return METHODS['corrmatrix']
 
 @router.post(
@@ -29,8 +34,10 @@ def corrmatrix_get():
     status_code=status.HTTP_201_CREATED,
     response_model=TaskPostResult
 )
-def scatterplot_post(params: ScatterplotTaskParams):
+def scatterplot_post(params: ScatterplotTaskParams, request: Request):
     res = create_task(run_scatterplot, params.dict())
+    res['url'] = request.url_for('get_result', job_id=res['job_id'])
+    router.url_path_for()
     return TaskPostResult(**res)
 
 @router.get(

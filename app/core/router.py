@@ -25,7 +25,8 @@ def jobs_list():
     return get_jobs_in_registries()
 
 @router.get(
-    "/results/{job_id}", 
+    "/results/{job_id}",
+    name='get_result',
     response_model=TaskResult,
     summary="Получение результата по задаче",
     description="Возвращает состояние задачи и результат, если есть."

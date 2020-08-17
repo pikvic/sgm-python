@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 import app.core.config as config
 from app.core.queue import get_queue, get_redis, create_task
@@ -30,6 +31,8 @@ app = FastAPI(
     version="0.2",
     openapi_tags=tags_metadata,
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(router_core, tags=["core"])
 

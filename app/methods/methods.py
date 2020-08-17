@@ -55,7 +55,7 @@ METHODS = {
         title='Диаграмма рассеяния',
         description='Построение диаграмм рассеяния для визуальной оценки корреляций для выбранных наборов столбцов.',
         name='scatterplot',
-        image='https://vrzkj25a871bpq7t1ugcgmn9-wpengine.netdna-ssl.com/wp-content/uploads/2018/08/ggplot-scatter-plot-in-r-with-straight-line.png'
+        image='static/scatterplot.png'
     ),
     'kmeans': MethodInfo(
         group='Кластерный анализ',
