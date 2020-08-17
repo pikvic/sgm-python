@@ -37,10 +37,9 @@ app.include_router(router_core, tags=["core"])
 if config.DEBUG:
     from app.methods.test.router import router as router_test
     app.include_router(router_test, prefix= "/test", tags=["test"])
-    
 
-app.include_router(router_legacy)
 app.include_router(router_api, prefix="/api/v1")
+app.include_router(router_legacy, tags=["legacy-deprecated"])
 
 if not config.UPLOAD_DIR.exists():
     config.UPLOAD_DIR.mkdir()

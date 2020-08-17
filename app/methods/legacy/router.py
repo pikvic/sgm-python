@@ -17,7 +17,7 @@ router = APIRouter()
     response_model=TaskPostResult,
     summary="Метод К-средних",
     description="Кластеризация методом К-средних",
-    tags=["clustering"]
+    deprecated=True
 )
 def kmeans(params: KMeansParams):
     res = create_task(run_kmeans, params.dict())
@@ -29,7 +29,7 @@ def kmeans(params: KMeansParams):
     response_model=TaskPostResult,
     summary="Метод иерархического кластерного анализа",
     description="Кластеризация методом иерархического кластерного анализа",
-    tags=["clustering"]
+    deprecated=True
 )
 def hca(params: HCAParams):
     res = create_task(run_hca, params.dict())
@@ -42,7 +42,7 @@ def hca(params: HCAParams):
     response_model=TaskPostResult,
     summary="Линейная регрессия",
     description="Построение линейной регрессии",
-    tags=["regression"]
+    deprecated=True
 )
 def linear(params: LinearParams):
     res = create_task(run_linear, params.dict())
@@ -54,7 +54,7 @@ def linear(params: LinearParams):
     response_model=TaskPostResult,
     summary="Описатиельная статистика",
     description="Вычисление описательной статистики по входным данным",
-    tags=["statistics"]
+    deprecated=True
 )
 def stats(params: StatsTaskParams):
     res = create_task(run_stats, params.dict())
@@ -66,7 +66,7 @@ def stats(params: StatsTaskParams):
     response_model=TaskPostResult,
     summary="Метод главных компонент",
     description="Выделение главных компонент",
-    tags=["factor"]
+    deprecated=True
 )
 def pca(params: PCAParams):
     res = create_task(run_pca, params.dict())
