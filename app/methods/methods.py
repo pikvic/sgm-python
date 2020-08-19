@@ -18,6 +18,12 @@ GROUPS = [
         description='Методы поиска групп в исходных данных.',
         image='https://img.pngio.com/r-script-showcase-microsoft-power-bi-community-clustering-png-300_173.png',
         methods=['kmeans', 'kmeansscreeplot']
+    ),
+    Group(
+        title='Предобработка данных',
+        description='Методы предобработки данных: стандатизация, нормализация, работа с пропущенными значениями и т.д.',
+        image='https://w0.pngwave.com/png/160/410/feature-chart-machine-learning-microsoft-azure-data-pre-processing-business-chart-publicity-s-png-clip-art-thumbnail.png',
+        methods=['standartization', 'missingvalues', 'normalization']
     )
 ]
 
@@ -51,7 +57,7 @@ METHODS = {
         image='https://i.stack.imgur.com/9pa7S.jpg'
     ),
     'scatterplot': MethodInfo(
-        group='Описательная статистика',
+        group='Корреляционный анализ',
         title='Диаграмма рассеяния',
         description='Построение диаграмм рассеяния для визуальной оценки корреляций для выбранных наборов столбцов.',
         name='scatterplot',
@@ -60,16 +66,30 @@ METHODS = {
     'kmeans': MethodInfo(
         group='Кластерный анализ',
         title='Метод k-средних',
-        description='Кластеризация входных данных методом k-средних.',
-        name='scatterplot',
+        description='Кластеризация входных данных методом k-средних. Рекомендуется предварительная нормализация или стандартизация данных.',
+        name='kmeans',
         image='https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRpg-UkIRFomhPvbHkXizOfXznb9S1FQbv7pw&usqp=CAU'
     ),
     'kmeansscreeplot': MethodInfo(
         group='Кластерный анализ',
         title='Выбор количества кластеров (каменистая осыпь)',
-        description='Построение графика каменистой осыпи для количества кластеров в исходных данных по методу k-средних. Позволяет определить оптимальное количество кластеров.',
+        description='Построение графика каменистой осыпи для количества кластеров в исходных данных по методу k-средних. Позволяет определить оптимальное количество кластеров. Рекомендуется предварительная нормализация или стандартизация данных.',
         name='kmeansscreeplot',
         image='https://www.researchgate.net/profile/Chirag_Deb/publication/320986519/figure/fig8/AS:560163938422791@1510564898246/Result-of-the-elbow-method-to-determine-optimum-number-of-clusters.png'
+    ),
+    'kmeans': MethodInfo(
+        group='Предобработка данных',
+        title='Стандартизация',
+        description='Приведение данных к распределению со средним 0 и стандартным отклонением 1.',
+        name='standartization',
+        image='https://miro.medium.com/max/1200/1*dZlwWGNhFco5bmpfwYyLCQ.png'
+    ),
+    'kmeansscreeplot': MethodInfo(
+        group='Предобработка данных',
+        title='Обработка пропусков в данных',
+        description='Обработка пропусков в данных на основе остальных значений согласно выбранной стратегии.',
+        name='missingvalues',
+        image='https://miro.medium.com/max/2816/1*MiJ_HpTbZECYjjF1qepNNQ.png'
     ),
 }
     

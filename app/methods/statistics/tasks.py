@@ -34,11 +34,11 @@ def run_summary(params):
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'summary', 'output.csv')
-            stats.to_csv(file_path)
+            stats.to_csv(file_path, index=False)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'summary', 'output.xlsx')
-            stats.to_excel(file_path)
+            stats.to_excel(file_path, index=False)
             results.append(str(file_path))
         else:
             raise AttributeError
@@ -79,7 +79,7 @@ def run_histogram(params):
             fig, ax = plt.subplots()
             sns.distplot(data, ax=ax)
             ax.set_title(title)
-            fig.savefig(file_path, dpi=int(params['image_dpi']))
+            fig.savefig(file_path, dpi=int(params['image_dpi']), bbox_inches = "tight")
             results.append(str(file_path))
     except Exception as e:
         return error(f'Ошибка при сохранении изображений с результатом : {e}')
@@ -116,7 +116,7 @@ def run_boxplot(params):
             fig, ax = plt.subplots()
             sns.boxplot(width=0.5, x=data, ax=ax)
             ax.set_title(title)
-            fig.savefig(file_path, dpi=int(params['image_dpi']))
+            fig.savefig(file_path, dpi=int(params['image_dpi']), bbox_inches = "tight")
             results.append(str(file_path))
     except Exception as e:
         return error(f'Ошибка при сохранении изображений с результатом : {e}')

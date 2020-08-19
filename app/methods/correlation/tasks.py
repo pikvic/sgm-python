@@ -72,11 +72,11 @@ def run_corrmatrix(params):
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'corrmatrix', 'output.csv')
-            corr.to_csv(file_path)
+            corr.to_csv(file_path, index=False)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'corrmatrix', 'output.xlsx')
-            corr.to_excel(file_path)
+            corr.to_excel(file_path, index=False)
             results.append(str(file_path))
         else:
             raise AttributeError
@@ -120,7 +120,7 @@ def run_scatterplot(params):
                 slope, intercept, r_value, p_value, std_err = linregress(x=p.get_lines()[0].get_xdata(),y=p.get_lines()[0].get_ydata())
                 title = f'Диаграмма рассеяния\nСтолбцы {name1} и {name2} \ny = {slope:.5f} * x + {intercept:.5f}'
                 ax.set_title(title)
-                fig.savefig(file_path, dpi=int(params['image_dpi']))
+                fig.savefig(file_path, dpi=int(params['image_dpi']), bbox_inches = "tight")
                 results.append(str(file_path))
     except Exception as e:
         return error(f'Ошибка при сохранении изображений с результатом : {e}')
