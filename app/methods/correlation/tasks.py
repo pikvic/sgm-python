@@ -72,11 +72,11 @@ def run_corrmatrix(params):
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'corrmatrix', 'output.csv')
-            corr.to_csv(file_path, index=False)
+            corr.to_csv(file_path)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'corrmatrix', 'output.xlsx')
-            corr.to_excel(file_path, index=False)
+            corr.to_excel(file_path)
             results.append(str(file_path))
         else:
             raise AttributeError

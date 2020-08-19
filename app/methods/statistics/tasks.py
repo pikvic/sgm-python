@@ -34,11 +34,11 @@ def run_summary(params):
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'summary', 'output.csv')
-            stats.to_csv(file_path, index=False)
+            stats.to_csv(file_path)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'summary', 'output.xlsx')
-            stats.to_excel(file_path, index=False)
+            stats.to_excel(file_path)
             results.append(str(file_path))
         else:
             raise AttributeError
