@@ -109,7 +109,7 @@ def run_kmeansscreeplot(params):
         file_path = generate_filename(root, 'KmeansScreePlot', filename)
         sns.set()
         fig, ax = plt.subplots()
-        sns.lineplot(x=krange, y=distances, markers=['x'], ax=ax)
+        sns.lineplot(x=krange, y=distances, ax=ax, marker='o')
         ax.set_title(title)
         ax.set_xlabel('Количество кластеров')
         ax.set_ylabel('Сумма квадратов расстояний')
