@@ -37,7 +37,6 @@ def corrmatrix_get(request: Request):
 def scatterplot_post(params: ScatterplotTaskParams, request: Request):
     res = create_task(run_scatterplot, params.dict())
     res['url'] = request.url_for('get_result', job_id=res['job_id'])
-    router.url_path_for()
     return TaskPostResult(**res)
 
 @router.get(
