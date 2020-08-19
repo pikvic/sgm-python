@@ -77,19 +77,26 @@ METHODS = {
         name='kmeansscreeplot',
         image='https://www.researchgate.net/profile/Chirag_Deb/publication/320986519/figure/fig8/AS:560163938422791@1510564898246/Result-of-the-elbow-method-to-determine-optimum-number-of-clusters.png'
     ),
-    'kmeans': MethodInfo(
+    'standartization': MethodInfo(
         group='Предобработка данных',
         title='Стандартизация',
         description='Приведение данных к распределению со средним 0 и стандартным отклонением 1.',
         name='standartization',
         image='https://miro.medium.com/max/1200/1*dZlwWGNhFco5bmpfwYyLCQ.png'
     ),
-    'kmeansscreeplot': MethodInfo(
+    'missingvalues': MethodInfo(
         group='Предобработка данных',
         title='Обработка пропусков в данных',
         description='Обработка пропусков в данных на основе остальных значений согласно выбранной стратегии.',
         name='missingvalues',
         image='https://miro.medium.com/max/2816/1*MiJ_HpTbZECYjjF1qepNNQ.png'
+    ),
+    'normalization': MethodInfo(
+        group='Предобработка данных',
+        title='Нормализация',
+        description='Приведение данных к нужному диапазону.',
+        name='normalization',
+        image='https://www.educative.io/api/edpresso/shot/5146765192855552/image/6250600309194752.png'
     ),
 }
     
