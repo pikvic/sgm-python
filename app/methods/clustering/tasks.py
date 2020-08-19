@@ -104,7 +104,7 @@ def run_kmeansscreeplot(params):
         data = df.iloc[:, columns]
         title = f'Каменистая осыпь:\nподбор оптимального k'
         image_format = params['image_format'].lower()
-        name = f'Столбцы {", ".join([str(c) for c in columns])}'
+        name = f'Columns {", ".join([str(c) for c in columns])}'
         filename = f'{name}.{image_format}'
         file_path = generate_filename(root, 'KmeansScreePlot', filename)
         sns.set()
