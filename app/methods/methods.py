@@ -24,6 +24,12 @@ GROUPS = [
         description='Методы предобработки данных: стандатизация, нормализация, работа с пропущенными значениями и т.д.',
         image='https://w0.pngwave.com/png/160/410/feature-chart-machine-learning-microsoft-azure-data-pre-processing-business-chart-publicity-s-png-clip-art-thumbnail.png',
         methods=['standartization', 'missingvalues', 'normalization']
+    ),
+    Group(
+        title='Факторный анализ',
+        description='Методы факторного анализа: выбор количества факторов, факторный анализ, метод главных компонент и т.д.',
+        image='https://scikit-learn.org/stable/_images/sphx_glr_plot_pca_iris_001.png',
+        methods=['factoranalysis', 'factorscreeplot', 'pca', 'pcachoose']
     )
 ]
 
@@ -97,6 +103,34 @@ METHODS = {
         description='Приведение данных к нужному диапазону.',
         name='normalization',
         image='https://www.educative.io/api/edpresso/shot/5146765192855552/image/6250600309194752.png'
+    ),
+    'factoranalysis': MethodInfo(
+        group='Факторный анализ',
+        title='Факторный анализ',
+        description='Метод факторного анализа, показывает факторную нагрузку, а также переводит измерения в пространство факторов',
+        name='factoranalysis',
+        image='https://res.cloudinary.com/dchysltjf/image/upload/f_auto,q_auto:best/v1554830233/1.png'
+    ),
+    'factorscreeplot': MethodInfo(
+        group='Факторный анализ',
+        title='Выбор количества факторов (каменистая осыпь)',
+        description='Построение графика каменистая осыпь для собственных значений факторов',
+        name='factorscreeplot',
+        image='https://res.cloudinary.com/dchysltjf/image/upload/f_auto,q_auto:best/v1554830233/3.png'
+    ),
+    'pca': MethodInfo(
+        group='Факторный анализ',
+        title='Метод главных компонент',
+        description='Метод главных компонент с вычислением всех необходимых значений.',
+        name='pca',
+        image='https://amva4newphysics.files.wordpress.com/2016/06/pca.gif'
+    ),
+     'pcachoose': MethodInfo(
+        group='Факторный анализ',
+        title='Выбор количества главных компонент',
+        description='Построение графика доли информации для определения количества главных компонент.',
+        name='pcachoose',
+        image='https://user.oc-static.com/upload/2019/04/16/15554174747084_pca3_1.png'
     ),
 }
     
