@@ -116,6 +116,9 @@ def validate_columns_params(params, ncolumns):
         res = parse_columns(params['columns2'], ncolumns)
         if not res['success']:
             return res
+    if 'target_column' in params:
+        if params['target_column'] > ncolumns:
+            return {'success': False, 'error': 'Указанный номер столбца больше, чем есть во входном файле'}
     return {'success': True}
 
 def generate_filename(path, prefix, name):

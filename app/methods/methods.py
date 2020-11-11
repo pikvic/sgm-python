@@ -30,6 +30,12 @@ GROUPS = [
         description='Методы факторного анализа: выбор количества факторов, факторный анализ, метод главных компонент и т.д.',
         image='https://scikit-learn.org/stable/_images/sphx_glr_plot_pca_iris_001.png',
         methods=['factoranalysis', 'factorscreeplot', 'pca', 'pcachoose']
+    ),
+    Group(
+        title='Регрессионный анализ',
+        description='Методы регрессионного анализа: линейная регрессия, полиномиальная регрессия и т.д.',
+        image='https://hackernoon.com/images/h31rz24si.jpg',
+        methods=['linearregression', 'polynomialregression']
     )
 ]
 
@@ -132,5 +138,20 @@ METHODS = {
         name='pcachoose',
         image='https://user.oc-static.com/upload/2019/04/16/15554174747084_pca3_1.png'
     ),
+    'linearregression': MethodInfo(
+        group='Регрессионный анализ',
+        title='Линейная регрессия',
+        description='Расчёт коэффициентов линейной регрессии и других параметров по входным данным.',
+        name='linearregression',
+        image='https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/1200px-Linear_regression.svg.png'
+    ),
+    'polynomialregression': MethodInfo(
+        group='Регрессионный анализ',
+        title='Полиномиальная регрессия',
+        description='Расчёт коэффициентов полиномиальной регрессии и других параметров по входным данным.',
+        name='polynomialregression',
+        image='https://imgs.developpaper.com/imgs/3314166135-5c013a8ecd84b_articlex.png'
+    ),
+    
 }
     
