@@ -86,7 +86,7 @@ def run_polynomialregression(params):
         index = []
         for power in polyreg[0].powers_:
             strings = []
-            for i, column in enumerate(x.columns):
+            for i, column in enumerate(data.columns):
                 strings.append(f'{column}^{power[i]}')
             string = ' * '.join(strings)
             index.append(string)
