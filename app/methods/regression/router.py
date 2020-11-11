@@ -34,7 +34,7 @@ def linearregression_get(request: Request):
     status_code=status.HTTP_201_CREATED,
     response_model=TaskPostResult
 )
-def factorscreeplot_post(params: PolynomialRegressionTaskParams, request: Request):
+def polynomialregression_post(params: PolynomialRegressionTaskParams, request: Request):
     res = create_task(run_polynomialregression, params.dict())
     res['url'] = request.url_for('get_result', job_id=res['job_id'])
     return TaskPostResult(**res)

@@ -162,22 +162,23 @@ def run_pca(params):
     try:
         pca = PCA(n_components=params['ncomponents'])
         components = pca.fit_transform(data)
-        components_stats_df = pd.DataFrame([pca.explained_variance_, pca.explained_variance_ratio_, pca.singular_values_])
-        components_stats_df.columns = ["Дисперсии осей проекции (выборочная)", "Доля информации (доля от общей дисперсии)", "Сингулярное значение"]
-        components_df = pd.DataFrame(pca.components_)
-        components_df.columns = data.columns
-    except:
-        return error('Ошибка при вычислении результата')
+        index = ["Дисперсии осей проекции (выборочная)", "Доля информации (доля от общей дисперсии)", "Сингулярное значение"]
+        columns = [f'Компонента {i}' for i in range(1, len(pca.components_) + 1)]
+        components_stats_df = pd.DataFrame([pca.explained_variance_, pca.explained_variance_ratio_, pca.singular_values_], index=index, columns=columns)
+        components_df = pd.DataFrame(pca.components_, index=columns, columns=data.columns)
+
+    except Exception as e:
+        return error(f'Ошибка при вычислении результата. {e}')
 
     # save output
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'pca', 'components_stats.csv')
-            components_stats_df.to_csv(file_path, index_label='Номер компоненты')
+            components_stats_df.to_csv(file_path)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'pca', 'components_stats.xlsx')
-            components_stats_df.to_excel(file_path, index_label='Номер компоненты')
+            components_stats_df.to_excel(file_path)
             results.append(str(file_path))
         else:
             raise AttributeError
@@ -188,11 +189,11 @@ def run_pca(params):
     try:
         if params['file_format'] == 'CSV':
             file_path = generate_filename(root, 'pca', 'components.csv')
-            components_df.to_csv(file_path, index_label='Номер компоненты')
+            components_df.to_csv(file_path)
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
             file_path = generate_filename(root, 'pca', 'components.xlsx')
-            components_df.to_excel(file_path, index_label='Номер компоненты')
+            components_df.to_excel(file_path)
             results.append(str(file_path))
         else:
             raise AttributeError

@@ -148,7 +148,7 @@ METHODS = {
     'polynomialregression': MethodInfo(
         group='Регрессионный анализ',
         title='Полиномиальная регрессия',
-        description='Расчёт коэффициентов полиномиальной регрессии и других параметров по входным данным.',
+        description='Расчёт коэффициентов полиномиальной регрессии по входным данным.',
         name='polynomialregression',
         image='https://imgs.developpaper.com/imgs/3314166135-5c013a8ecd84b_articlex.png'
     ),
