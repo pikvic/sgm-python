@@ -97,11 +97,11 @@ def run_polynomialregression(params):
     # save output
     try:
         if params['file_format'] == 'CSV':
-            file_path = generate_filename(root, 'linearregression', 'coefficients.csv')
+            file_path = generate_filename(root, 'polynomialregression', 'coefficients.csv')
             poly_df.to_csv(file_path, index_label='Слагаемое')
             results.append(str(file_path))
         elif params['file_format'] == 'XLSX':
-            file_path = generate_filename(root, 'linearregression', 'coefficients.xlsx')
+            file_path = generate_filename(root, 'polynomialregression', 'coefficients.xlsx')
             poly_df.to_excel(file_path, index_label='Слагаемое')
             results.append(str(file_path))
         else:
