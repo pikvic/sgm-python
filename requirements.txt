@@ -31,4 +31,4 @@ starlette==0.13.6
 threadpoolctl==2.1.0
 urllib3==1.25.9
 uvicorn==0.11.8
-websockets==8.1
+websockets==9.1
